@@ -1,26 +1,19 @@
-import Image from "next/image";
-import type { Metadata } from "next";
-import HeroSection from "@/components/sections/herosection";
-import WhyChooseUS from "@/components/sections/whychooseus";
 import GetInTouch from "@/components/homeComponents/getintouch";
-import AdBanner from "@/components/homeComponents/adbanner";
-import Packages from "@/components/homeComponents/packages";
-import Team from "@/components/homeComponents/team";
-import Gallery from "./gallery/page";
+import Breadcrumb from "@/components/sections/breadcrumb";
+import type { Metadata } from "next";
+
 export const metadata: Metadata = {
-  title: "Home Page",
-  description: "D-Fitness Home Page",
+  title: "Gallery Page",
+  description: "D-Fitness Gallery Page",
 };
 
-export default function Home() {
+export default async function Gallery() {
   return (
     <>
-      <HeroSection />
-      <WhyChooseUS />
-      <AdBanner />
-      <Packages />
+      <Breadcrumb title="Gallery" />
+
       {/* <!-- Gallery Section Begin --> */}
-      <div className="gallery-section">
+      <div className="gallery-section gallery-page">
         <div className="gallery">
           <div className="grid-sizer"></div>
           <div
@@ -89,10 +82,43 @@ export default function Home() {
               <i className="fa fa-picture-o"></i>
             </a>
           </div>
+          <div
+            className="gs-item grid-wide set-bg"
+            data-setbg="img/gallery/gallery-7.jpg"
+          >
+            <a
+              href="img/gallery/gallery-7.jpg"
+              className="thumb-icon image-popup"
+            >
+              <i className="fa fa-picture-o"></i>
+            </a>
+          </div>
+          <div
+            className="gs-item set-bg"
+            data-setbg="img/gallery/gallery-8.jpg"
+          >
+            <a
+              href="img/gallery/gallery-8.jpg"
+              className="thumb-icon image-popup"
+            >
+              <i className="fa fa-picture-o"></i>
+            </a>
+          </div>
+          <div
+            className="gs-item set-bg"
+            data-setbg="img/gallery/gallery-9.jpg"
+          >
+            <a
+              href="img/gallery/gallery-9.jpg"
+              className="thumb-icon image-popup"
+            >
+              <i className="fa fa-picture-o"></i>
+            </a>
+          </div>
         </div>
       </div>
       {/* <!-- Gallery Section End --> */}
-      <Team />
+      
       <GetInTouch />
     </>
   );

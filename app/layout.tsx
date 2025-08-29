@@ -6,6 +6,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import Header from "@/components/layoutComponents/header";
 import Footer from "@/components/layoutComponents/footer";
 import Loader from "@/components/utilityComponents/loader";
+import Search from "@/components/layoutComponents/search";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <main>{children}</main>
         </AppRouterCacheProvider>
+        <Search/>
         <Footer />
 
         {/* JS Files */}
