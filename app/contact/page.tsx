@@ -1,4 +1,5 @@
 import GetInTouch from "@/components/homeComponents/getintouch";
+import Breadcrumb from "@/components/sections/breadcrumb";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,26 +10,7 @@ export const metadata: Metadata = {
 export default async function ContactUS() {
   return (
     <>
-      {/* <!-- Breadcrumb Section Begin --> */}
-      <section
-        className="breadcrumb-section set-bg"
-        data-setbg="img/breadcrumb-bg.jpg"
-      >
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12 text-center">
-              <div className="breadcrumb-text">
-                <h2>Contact Us</h2>
-                <div className="bt-option">
-                  <a href="./index.html">Home</a>
-                  <span>Contact us</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* <!-- Breadcrumb Section End --> */}
+      <Breadcrumb title="Contact us"/>
 
       {/* <!-- Contact Section Begin --> */}
       <section className="contact-section spad">
@@ -36,7 +18,7 @@ export default async function ContactUS() {
           <div className="row">
             <div className="col-lg-6">
               <div className="section-title contact-title">
-                <span>Contact Us</span>
+                <span>Contact us</span>
                 <h2>GET IN TOUCH</h2>
               </div>
               <div className="contact-widget">
@@ -87,12 +69,9 @@ export default async function ContactUS() {
           </div>
         </div>
       </section>
-
       {/* <!-- Contact Section End --> */}
 
-      {/* <!-- Get In Touch Section Begin --> */}
       <GetInTouch />
-      {/* <!-- Get In Touch Section End --> */}
     </>
   );
 }

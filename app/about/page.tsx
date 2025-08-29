@@ -3,6 +3,8 @@ import WhyChooseUS from "@/components/sections/whychooseus";
 import AdBanner from "@/components/homeComponents/adbanner";
 import Testimonial from "@/components/homeComponents/testimonial";
 import GetInTouch from "@/components/homeComponents/getintouch";
+import Breadcrumb from "@/components/sections/breadcrumb";
+import Team from "@/components/homeComponents/team";
 
 export const metadata: Metadata = {
   title: "About US",
@@ -11,28 +13,9 @@ export const metadata: Metadata = {
 export default async function About() {
   return (
     <>
-      {/* <!-- Breadcrumb Section Begin --> */}
-      <section
-        className="breadcrumb-section set-bg"
-        data-setbg="img/breadcrumb-bg.jpg"
-      >
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12 text-center">
-              <div className="breadcrumb-text">
-                <h2>About us</h2>
-                <div className="bt-option">
-                  <a href="./index.html">Home</a>
-                  <span>About</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* <!-- ChoseUs Section Begin --> */}
+      <Breadcrumb title="Our Team" />
+      
       <WhyChooseUS />
-      {/* <!-- ChoseUs Section End --> */}
 
       {/* <!-- About US Section Begin --> */}
       <section className="aboutus-section">
@@ -100,108 +83,13 @@ export default async function About() {
       </section>
       {/* <!-- About US Section End --> */}
 
-      {/* <!-- Team Section Begin --> */}
-      <section className="team-section spad">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="team-title">
-                <div className="section-title">
-                  <span>Our Team</span>
-                  <h2>TRAIN WITH EXPERTS</h2>
-                </div>
-                <a href="#" className="primary-btn btn-normal appoinment-btn">
-                  appointment
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="row">
-            <div className="ts-slider owl-carousel">
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-1.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-2.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-3.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-4.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-5.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-              <div className="col-lg-4">
-                <div
-                  className="ts-item set-bg"
-                  data-setbg="img/team/team-6.jpg"
-                >
-                  <div className="ts_text">
-                    <h4>Athart Rachel</h4>
-                    <span>Gym Trainer</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      {/* <!-- Team Section End --> */}
+      <Team />
 
-      {/* <!-- Banner Section Begin --> */}
       <AdBanner />
-      {/* <!-- Banner Section End --> */}
 
-      {/* <!-- Testimonial Section Begin --> */}
       <Testimonial />
-      {/* <!-- Testimonial Section End --> */}
 
-      {/* <!-- Get In Touch Section Begin --> */}
       <GetInTouch />
-      {/* <!-- Get In Touch Section End --> */}
-      {/* <!-- Breadcrumb Section End --> */}
     </>
   );
 }
