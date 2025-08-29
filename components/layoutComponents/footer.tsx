@@ -47,16 +47,16 @@ export default function Footer() {
                 <h4>Useful links</h4>
                 <ul>
                   <li>
-                    <a href="#">About</a>
+                    <a href="/about">About</a>
                   </li>
                   <li>
-                    <a href="#">Blog</a>
+                    <a href="/services">Services</a>
                   </li>
                   <li>
-                    <a href="#">Classes</a>
+                    <a href="/ourteam">Our Team</a>
                   </li>
                   <li>
-                    <a href="#">Contact</a>
+                    <a href="/gallery">Gallery</a>
                   </li>
                 </ul>
               </div>
@@ -66,16 +66,16 @@ export default function Footer() {
                 <h4>Support</h4>
                 <ul>
                   <li>
-                    <a href="#">Login</a>
+                    <a href="/login">Login</a>
                   </li>
                   <li>
-                    <a href="#">My account</a>
+                    <a href="/myaccount">My account</a>
                   </li>
                   <li>
-                    <a href="#">Subscribe</a>
+                    <a href="/subscribe">Subscribe</a>
                   </li>
                   <li>
-                    <a href="#">Contact</a>
+                    <a href="/contact">Contact</a>
                   </li>
                 </ul>
               </div>

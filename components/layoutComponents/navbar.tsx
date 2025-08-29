@@ -1,51 +1,35 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
     <nav className="nav-menu">
       <ul>
-        <li className="active">
-          <Link href="/">Home</Link>
+        <li className={pathname === "/" ? "active" : ""}>
+          <a href="/">Home</a>
         </li>
-        <li>
-          <Link href="/about">About Us</Link>
+        <li className={pathname === "/services" ? "active" : ""}>
+          <a href="/services">Services</a>
         </li>
-        <li>
-          <a href="./class-details.html">Classes</a>
+        <li className={pathname === "/team" ? "active" : ""}>
+          <a href="/team">Our Team</a>
         </li>
-        <li>
-          <a href="./services.html">Services</a>
+        <li className={pathname === "/gallery" ? "active" : ""}>
+          <a href="/gallery">Gallery</a>
         </li>
-        <li>
-          <a href="./team.html">Our Team</a>
+        <li className={pathname === "/contact" ? "active" : ""}>
+          <a href="/contact">Contact</a>
         </li>
-        <li>
-          <a href="#">Pages</a>
-          <ul className="dropdown">
-            <li>
-              <a href="./about-us.html">About us</a>
-            </li>
-            <li>
-              <a href="./class-timetable.html">Classes timetable</a>
-            </li>
-            <li>
-              <a href="./bmi-calculator.html">Bmi calculate</a>
-            </li>
-            <li>
-              <a href="./team.html">Our team</a>
-            </li>
-            <li>
-              <a href="./gallery.html">Gallery</a>
-            </li>
-            <li>
-              <a href="./blog.html">Our blog</a>
-            </li>
-            <li>
-              <a href="./404.html">404</a>
-            </li>
-          </ul>
+        <li className={pathname === "/about" ? "active" : ""}>
+          <a href="/about">About Us</a>
         </li>
-        <li>
-          <a href="./contact.html">Contact</a>
+        {/* <li className={pathname === "/dashboard" ? "active" : ""}>
+          <a href="/dashboard">Dashboard</a>
+        </li> */}
+        <li className={pathname === "/login" ? "active" : ""}>
+          <a href="/login">Login/signup</a>
         </li>
       </ul>
     </nav>
