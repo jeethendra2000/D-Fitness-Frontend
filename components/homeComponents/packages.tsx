@@ -32,9 +32,6 @@ export default async function Packages() {
                 <a href="#" className="primary-btn pricing-btn">
                   Enroll now
                 </a>
-                <a href="#" className="thumb-icon">
-                  <i className="fa fa-picture-o"></i>
-                </a>
               </div>
             </div>
             <div className="col-lg-4 col-md-8">
@@ -55,9 +52,6 @@ export default async function Packages() {
                 <a href="#" className="primary-btn pricing-btn">
                   Enroll now
                 </a>
-                <a href="#" className="thumb-icon">
-                  <i className="fa fa-picture-o"></i>
-                </a>
               </div>
             </div>
             <div className="col-lg-4 col-md-8">
@@ -77,9 +71,6 @@ export default async function Packages() {
                 </ul>
                 <a href="#" className="primary-btn pricing-btn">
                   Enroll now
-                </a>
-                <a href="#" className="thumb-icon">
-                  <i className="fa fa-picture-o"></i>
                 </a>
               </div>
             </div>

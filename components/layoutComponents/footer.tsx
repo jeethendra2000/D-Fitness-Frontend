@@ -115,9 +115,9 @@ export default function Footer() {
                 <p>
                   {/* <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> */}
                   Copyright &copy;
-                  {new Date().getFullYear()} All rights reserved | This template
-                  is made with{" "}
-                  <i className="fa fa-heart" aria-hidden="true"></i> by{" "}
+                  {new Date().getFullYear()} All rights reserved | {" "}
+                  {/* Made with{" "} <i className="fa fa-heart" aria-hidden="true"></i> |  */}
+                  {" "}
                   <a href="https://colorlib.com" target="_blank">
                     Colorlib
                   </a>
