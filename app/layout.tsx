@@ -65,18 +65,22 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <main>{children}</main>
         </AppRouterCacheProvider>
-        <Search/>
+        <Search />
         <Footer />
 
         {/* JS Files */}
+        {/* JS Files */}
         <Script src="/js/jquery-3.3.1.min.js" strategy="beforeInteractive" />
-        <Script src="/js/bootstrap.min.js" strategy="lazyOnload" />
-        <Script src="/js/jquery.magnific-popup.min.js" strategy="lazyOnload" />
-        <Script src="/js/masonry.pkgd.min.js" strategy="lazyOnload" />
-        <Script src="/js/jquery.barfiller.js" strategy="lazyOnload" />
-        <Script src="/js/jquery.slicknav.js" strategy="lazyOnload" />
-        <Script src="/js/owl.carousel.min.js" strategy="lazyOnload" />
-        <Script src="/js/main.js" strategy="lazyOnload" />
+        <Script src="/js/bootstrap.min.js" strategy="afterInteractive" />
+        <Script
+          src="/js/jquery.magnific-popup.min.js"
+          strategy="afterInteractive"
+        />
+        <Script src="/js/masonry.pkgd.min.js" strategy="afterInteractive" />
+        <Script src="/js/jquery.barfiller.js" strategy="afterInteractive" />
+        <Script src="/js/jquery.slicknav.js" strategy="afterInteractive" />
+        <Script src="/js/owl.carousel.min.js" strategy="afterInteractive" />
+        <Script src="/js/main.js" strategy="afterInteractive" />
       </body>
     </html>
   );
