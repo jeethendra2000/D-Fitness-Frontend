@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import Header from "@/components/layoutComponents/header";
 import Footer from "@/components/layoutComponents/footer";
+import Loader from "@/components/utilityComponents/loader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,15 +38,43 @@ export default function RootLayout({
           src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
           strategy="afterInteractive"
         /> */}
+        {/* Google Fonts */}
+        <link
+          href="https://fonts.googleapis.com/css?family=Muli:300,400,500,600,700,800,900&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css?family=Oswald:300,400,500,600,700&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/css/flaticon.css" />
+        <link rel="stylesheet" href="/css/owl.carousel.min.css" />
+        <link rel="stylesheet" href="/css/barfiller.css" />
+        <link rel="stylesheet" href="/css/magnific-popup.css" />
+        <link rel="stylesheet" href="/css/slicknav.min.css" />
+        <link rel="stylesheet" href="/css/style.css" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* <Loader/> */}
         <Header />
         <AppRouterCacheProvider>
           <main>{children}</main>
         </AppRouterCacheProvider>
         <Footer />
+
+        {/* JS Files */}
+        <Script src="/js/jquery-3.3.1.min.js" strategy="beforeInteractive" />
+        <Script src="/js/bootstrap.min.js" strategy="lazyOnload" />
+        <Script src="/js/jquery.magnific-popup.min.js" strategy="lazyOnload" />
+        <Script src="/js/masonry.pkgd.min.js" strategy="lazyOnload" />
+        <Script src="/js/jquery.barfiller.js" strategy="lazyOnload" />
+        <Script src="/js/jquery.slicknav.js" strategy="lazyOnload" />
+        <Script src="/js/owl.carousel.min.js" strategy="lazyOnload" />
+        <Script src="/js/main.js" strategy="lazyOnload" />
       </body>
     </html>
   );

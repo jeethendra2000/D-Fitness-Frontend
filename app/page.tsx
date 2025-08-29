@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import HeroSection from "@/components/sections/herosection";
 
 export const metadata: Metadata = {
   title: "Home Page",
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-   <>Home Page</>
+    <>
+      <HeroSection />
+    </>
   );
 }
