@@ -1,3 +1,4 @@
+import NotFound from "@/components/utilityComponents/notFound";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,7 +9,8 @@ export const metadata: Metadata = {
 export default async function Admin() {
   return (
     <>
-      <h1>Admin</h1>
+      {/* <h1>Admin</h1> */}
+      <NotFound/>
     </>
   );
 }

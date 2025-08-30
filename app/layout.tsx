@@ -69,8 +69,8 @@ export default function RootLayout({
         <Footer />
 
         {/* JS Files */}
-        {/* JS Files */}
         <Script src="/js/jquery-3.3.1.min.js" strategy="beforeInteractive" />
+        <Script src="/js/owl.carousel.min.js" strategy="afterInteractive" />
         <Script src="/js/bootstrap.min.js" strategy="afterInteractive" />
         <Script
           src="/js/jquery.magnific-popup.min.js"
@@ -79,7 +79,6 @@ export default function RootLayout({
         <Script src="/js/masonry.pkgd.min.js" strategy="afterInteractive" />
         <Script src="/js/jquery.barfiller.js" strategy="afterInteractive" />
         <Script src="/js/jquery.slicknav.js" strategy="afterInteractive" />
-        <Script src="/js/owl.carousel.min.js" strategy="afterInteractive" />
         <Script src="/js/main.js" strategy="afterInteractive" />
       </body>
     </html>

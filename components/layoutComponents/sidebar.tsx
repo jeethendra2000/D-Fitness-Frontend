@@ -13,19 +13,19 @@ export default function Sidebar() {
         <nav className="canvas-menu mobile-menu">
           <ul>
             <li>
-              <a href="./index.html">Home</a>
+              <a href="/">Home</a>
             </li>
             <li>
-              <a href="./about-us.html">About Us</a>
+              <a href="/about">About Us</a>
             </li>
             <li>
               <a href="./classes.html">Classes</a>
             </li>
             <li>
-              <a href="./services.html">Services</a>
+              <a href="/services">Services</a>
             </li>
             <li>
-              <a href="./team.html">Our Team</a>
+              <a href="/team">Our Team</a>
             </li>
             <li>
               <a href="#">Pages</a>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function About() {
   return (
     <>
-      <Breadcrumb title="Our Team" />
+      <Breadcrumb title="About Us" />
       
       <WhyChooseUS />
 
