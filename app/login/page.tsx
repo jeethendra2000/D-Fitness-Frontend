@@ -11,41 +11,6 @@ export default async function login() {
     <>
       <Breadcrumb title="Login/SignUp"/>
 
-      {/* <!-- Contact Section Begin --> */}
-      {/* <section className="contact-section spad">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-6">
-              <div className="section-title contact-title">
-                <span>Contact us</span>
-                <h2>GET IN TOUCH</h2>
-              </div>
-              <div className="contact-widget">
-                <div className="cw-text">
-                  <i className="fa fa-map-marker"></i>
-                  <p>
-                    Dream fitness gym
-                    <br />
-                    b, Arsikere road, Katihalli, Hassan,
-                    <br /> Karnataka 573201
-                  </p>
-                </div>
-                <div className="cw-text">
-                  <i className="fa fa-mobile"></i>
-                  <ul>
-                    <li> +91 99016 47430</li>
-                    <li> +91 99016 47430</li>
-                  </ul>
-                </div>
-                <div className="cw-text email">
-                  <i className="fa fa-envelope"></i>
-                  <p>dfitness@gmail.com</p>
-                </div>
-              </div>
-            </div> */}
-
-
-
         <section className="contact-section spad">
         <div className="container">
           <div className="row">
