@@ -8,7 +8,7 @@ export default function Breadcrumb({ title }: BreadcrumbProps) {
       <section
         className="breadcrumb-section set-bg"
         // data-setbg="img/breadcrumb-bg.jpg"
-        data-setbg="img/hero2.png"
+        data-setbg="/img/hero2.png"
       >
         <div className="container">
           <div className="row">
