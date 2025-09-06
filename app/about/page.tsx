@@ -5,6 +5,7 @@ import Testimonial from "@/components/homeComponents/testimonial";
 import GetInTouch from "@/components/homeComponents/getintouch";
 import Breadcrumb from "@/components/sections/breadcrumb";
 import Team from "@/components/homeComponents/team";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About US",
@@ -14,7 +15,7 @@ export default async function About() {
   return (
     <>
       <Breadcrumb title="About Us" />
-      
+
       <WhyChooseUS />
 
       {/* <!-- About US Section Begin --> */}
@@ -22,13 +23,20 @@ export default async function About() {
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-6 p-0">
-              <div className="about-video set-bg" data-setbg="img/about-us.jpg">
-                <a
-                  href="https://www.youtube.com/watch?v=EzKkl64rRbM"
+              <div
+                className="about-video"
+                style={{
+                  backgroundImage: "img/about-us.jpg",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <Link
+                  href="https://youtu.be/wZE9HuQzH_E?si=C6gPKza8W82unVEi"
                   className="play-btn video-popup"
                 >
                   <i className="fa fa-caret-right"></i>
-                </a>
+                </Link>
               </div>
             </div>
             <div className="col-lg-6 p-0">

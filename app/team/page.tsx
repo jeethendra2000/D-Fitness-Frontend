@@ -1,6 +1,8 @@
 import GetInTouch from "@/components/homeComponents/getintouch";
 import Breadcrumb from "@/components/sections/breadcrumb";
 import type { Metadata } from "next";
+import { TeamMembersList } from "@/configs/teamMembersList";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Our Team Page",
@@ -29,156 +31,51 @@ export default async function Team() {
             </div>
           </div>
           <div className="row">
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-1.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
+            {TeamMembersList.map((teamMember) => (
+              <div className="col-lg-4 col-sm-6" key={teamMember.imageURL}>
+                <div
+                  className="ts-item"
+                  style={{
+                    backgroundImage: `url(${teamMember.imageURL})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="ts_text">
+                    <h4>{teamMember.name}</h4>
+                    <span>{teamMember.role}</span>
+                    <div className="tt_social">
+                      {teamMember.socialLink.facebook && (
+                        <Link href={teamMember.socialLink.facebook}>
+                          <i className="fa fa-facebook"></i>
+                        </Link>
+                      )}
+                      {teamMember.socialLink.instagram && (
+                        <Link href={teamMember.socialLink.instagram}>
+                          <i className="fa fa-instagram"></i>
+                        </Link>
+                      )}
+
+                      {teamMember.socialLink.whatsapp && (
+                        <Link href={teamMember.socialLink.whatsapp}>
+                          <i className="fa fa-whatsapp"></i>
+                        </Link>
+                      )}
+                      {teamMember.socialLink.email && (
+                        <Link href={teamMember.socialLink.email}>
+                          <i className="fa fa-envelope-o"></i>
+                        </Link>
+                      )}
+                      {teamMember.socialLink.youtube && (
+                        <Link href={teamMember.socialLink.youtube}>
+                          <i className="fa fa-youtube-play"></i>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-2.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-3.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-4.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-5.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-lg-4 col-sm-6">
-              <div className="ts-item set-bg" data-setbg="img/team/team-6.jpg">
-                <div className="ts_text">
-                  <h4>Athart Rachel</h4>
-                  <span>Gym Trainer</span>
-                  <div className="tt_social">
-                    <a href="#">
-                      <i className="fa fa-facebook"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-twitter"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-youtube-play"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa fa-instagram"></i>
-                    </a>
-                    <a href="#">
-                      <i className="fa  fa-envelope-o"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

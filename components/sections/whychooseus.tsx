@@ -1,7 +1,6 @@
 export default function WhyChooseUS() {
   return (
     <>
-      {/* <!-- ChoseUs Section Begin --> */}
       <section className="choseus-section spad">
         <div className="container">
           <div className="row">
@@ -56,7 +55,6 @@ export default function WhyChooseUS() {
           </div>
         </div>
       </section>
-      {/* <!-- ChoseUs Section End --> */}
     </>
   );
 }

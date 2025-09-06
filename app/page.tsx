@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 import HeroSection from "@/components/sections/herosection";
 import WhyChooseUS from "@/components/sections/whychooseus";
@@ -6,7 +5,6 @@ import GetInTouch from "@/components/homeComponents/getintouch";
 import AdBanner from "@/components/homeComponents/adbanner";
 import Packages from "@/components/homeComponents/packages";
 import Team from "@/components/homeComponents/team";
-import Gallery from "./gallery/page";
 export const metadata: Metadata = {
   title: "Home Page",
   description: "D-Fitness Home Page",
@@ -19,79 +17,6 @@ export default function Home() {
       <WhyChooseUS />
       <AdBanner />
       <Packages />
-      {/* <!-- Gallery Section Begin --> */}
-      <div className="gallery-section">
-        <div className="gallery">
-          <div className="grid-sizer"></div>
-          <div
-            className="gs-item grid-wide set-bg"
-            data-setbg="img/gallery/gallery-1.jpg"
-          >
-            <a
-              href="img/gallery/gallery-1.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-          <div
-            className="gs-item set-bg"
-            data-setbg="img/gallery/gallery-2.jpg"
-          >
-            <a
-              href="img/gallery/gallery-2.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-          <div
-            className="gs-item set-bg"
-            data-setbg="img/gallery/gallery-3.jpg"
-          >
-            <a
-              href="img/gallery/gallery-3.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-          <div
-            className="gs-item set-bg"
-            data-setbg="img/gallery/gallery-4.jpg"
-          >
-            <a
-              href="img/gallery/gallery-4.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-          <div
-            className="gs-item set-bg"
-            data-setbg="img/gallery/gallery-5.jpg"
-          >
-            <a
-              href="img/gallery/gallery-5.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-          <div
-            className="gs-item grid-wide set-bg"
-            data-setbg="img/gallery/gallery-6.jpg"
-          >
-            <a
-              href="img/gallery/gallery-6.jpg"
-              className="thumb-icon image-popup"
-            >
-              <i className="fa fa-picture-o"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {/* <!-- Gallery Section End --> */}
       <Team />
       <GetInTouch />
     </>

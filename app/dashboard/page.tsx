@@ -1,4 +1,10 @@
+import Sidebar from "@/components/layoutComponents/sidebar";
+import Breadcrumb from "@/components/sections/breadcrumb";
 import type { Metadata } from "next";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import { styled } from "@mui/material/styles";
 
 export const metadata: Metadata = {
   title: "Dashboard Page",
@@ -8,7 +14,7 @@ export const metadata: Metadata = {
 export default async function Dashboard() {
   return (
     <>
-      <h1>Dashboard</h1>
+      <Breadcrumb title="Dashboard" />
     </>
   );
 }

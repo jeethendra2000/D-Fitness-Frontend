@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 export default function Footer() {
   return (
     <footer>
@@ -9,14 +10,14 @@ export default function Footer() {
             <div className="col-lg-4">
               <div className="fs-about">
                 <div className="fa-logo">
-                  <a href="#">
+                  <Link href="#">
                     <Image
                       src="/img/logo.png"
                       width={200}
                       height={200}
                       alt="logo"
                     />
-                  </a>
+                  </Link>
                 </div>
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -24,21 +25,24 @@ export default function Footer() {
                   endisse ultrices gravida lorem.
                 </p>
                 <div className="fa-social">
-                  <a href="#">
+                  <Link href="#">
                     <i className="fa fa-facebook"></i>
-                  </a>
-                  <a href="#">
+                  </Link>
+                  <Link href="#">
                     <i className="fa fa-twitter"></i>
-                  </a>
-                  <a href="#">
+                  </Link>
+                  <Link href="#">
                     <i className="fa fa-youtube-play"></i>
-                  </a>
-                  <a href="#">
+                  </Link>
+                  <Link href="#">
                     <i className="fa fa-instagram"></i>
-                  </a>
-                  <a href="#">
+                  </Link>
+                  <Link href="#">
+                    <i className="fa  fa-whatsapp"></i>
+                  </Link>
+                  <Link href="#">
                     <i className="fa  fa-envelope-o"></i>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -47,16 +51,16 @@ export default function Footer() {
                 <h4>Useful links</h4>
                 <ul>
                   <li>
-                    <a href="/about">About</a>
+                    <Link href="/about">About</Link>
                   </li>
                   <li>
-                    <a href="/services">Services</a>
+                    <Link href="/services">Services</Link>
                   </li>
                   <li>
-                    <a href="/ourteam">Our Team</a>
+                    <Link href="/ourteam">Our Team</Link>
                   </li>
                   <li>
-                    <a href="/gallery">Gallery</a>
+                    <Link href="/gallery">Gallery</Link>
                   </li>
                 </ul>
               </div>
@@ -66,16 +70,16 @@ export default function Footer() {
                 <h4>Support</h4>
                 <ul>
                   <li>
-                    <a href="/login">Login</a>
+                    <Link href="/login">Login</Link>
                   </li>
                   <li>
-                    <a href="/myaccount">My account</a>
+                    <Link href="/myaccount">My account</Link>
                   </li>
                   <li>
-                    <a href="/subscribe">Subscribe</a>
+                    <Link href="/subscribe">Subscribe</Link>
                   </li>
                   <li>
-                    <a href="/contact">Contact</a>
+                    <Link href="/contact">Contact</Link>
                   </li>
                 </ul>
               </div>
@@ -85,9 +89,9 @@ export default function Footer() {
                 <h4>Tips & Guides</h4>
                 <div className="fw-recent">
                   <h6>
-                    <a href="#">
+                    <Link href="#">
                       Physical fitness may help prevent depression, anxiety
-                    </a>
+                    </Link>
                   </h6>
                   <ul>
                     <li>3 min read</li>
@@ -96,10 +100,10 @@ export default function Footer() {
                 </div>
                 <div className="fw-recent">
                   <h6>
-                    <a href="#">
+                    <Link href="#">
                       Fitness: The best exercise to lose belly fat and tone
                       up...
-                    </a>
+                    </Link>
                   </h6>
                   <ul>
                     <li>3 min read</li>
@@ -115,12 +119,11 @@ export default function Footer() {
                 <p>
                   {/* <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> */}
                   Copyright &copy;
-                  {new Date().getFullYear()} All rights reserved | {" "}
-                  {/* Made with{" "} <i className="fa fa-heart" aria-hidden="true"></i> |  */}
-                  {" "}
-                  <a href="https://colorlib.com" target="_blank">
+                  {new Date().getFullYear()} All rights reserved |{" "}
+                  {/* Made with{" "} <i className="fa fa-heart" aria-hidden="true"></i> |  */}{" "}
+                  <Link href="https://colorlib.com" target="_blank">
                     Colorlib
-                  </a>
+                  </Link>
                   {/* <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> */}
                 </p>
               </div>

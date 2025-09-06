@@ -1,14 +1,19 @@
+import Link from "next/link";
+
 interface BreadcrumbProps {
   title: string; // main heading
 }
+
 export default function Breadcrumb({ title }: BreadcrumbProps) {
   return (
     <>
-      {/* <!-- Breadcrumb Section Begin --> */}
       <section
-        className="breadcrumb-section set-bg"
-        // data-setbg="img/breadcrumb-bg.jpg"
-        data-setbg="img/hero2.png"
+        className="breadcrumb-section"
+        style={{
+          backgroundImage: "url('/img/hero2.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
         <div className="container">
           <div className="row">
@@ -16,7 +21,7 @@ export default function Breadcrumb({ title }: BreadcrumbProps) {
               <div className="breadcrumb-text">
                 <h2>{title}</h2>
                 <div className="bt-option">
-                  <a href="/">Home</a>
+                  <Link href="/">Home</Link>
                   <span style={{ color: "white" }}>{title}</span>
                 </div>
               </div>
@@ -24,7 +29,6 @@ export default function Breadcrumb({ title }: BreadcrumbProps) {
           </div>
         </div>
       </section>
-      {/* <!-- Breadcrumb Section End --> */}
     </>
   );
 }

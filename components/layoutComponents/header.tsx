@@ -1,7 +1,7 @@
-import Head from "next/head";
 import Navbar from "@/components/layoutComponents/navbar";
 import Sidebar from "@/components/layoutComponents/sidebar";
 import Image from 'next/image';
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -12,9 +12,9 @@ export default function Header() {
             <div className="row">
                 <div className="col-lg-3">
                     <div className="logo">
-                        <a href="./index.html">
+                        <Link href="./index.html">
                              <Image src="/img/logo.png" width={150} height={150} alt="Picture of the author"/>
-                        </a>
+                        </Link>
                     </div>
                 </div>
                 <div className="col-lg-6">
@@ -26,10 +26,10 @@ export default function Header() {
                             <i className="fa fa-search"></i>
                         </div>
                         <div className="to-social">
-                            <a href="#"><i className="fa fa-facebook"></i></a>
-                            <a href="#"><i className="fa fa-twitter"></i></a>
-                            <a href="#"><i className="fa fa-youtube-play"></i></a>
-                            <a href="#"><i className="fa fa-instagram"></i></a>
+                            <Link href="#"><i className="fa fa-facebook"></i></Link>
+                            <Link href="#"><i className="fa fa-twitter"></i></Link>
+                            <Link href="#"><i className="fa fa-youtube-play"></i></Link>
+                            <Link href="#"><i className="fa fa-instagram"></i></Link>
                         </div>
                     </div>
                 </div>

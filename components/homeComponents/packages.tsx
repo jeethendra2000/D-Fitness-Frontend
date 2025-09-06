@@ -2,7 +2,6 @@ import Image from "next/image";
 export default async function Packages() {
   return (
     <>
-      {/* <!-- Pricing Section Begin --> */}
       <section className="pricing-section service-pricing spad">
         <div className="container">
           <div className="row">
@@ -77,7 +76,6 @@ export default async function Packages() {
           </div>
         </div>
       </section>
-      {/* <!-- Pricing Section End --> */}
     </>
   );
 }
