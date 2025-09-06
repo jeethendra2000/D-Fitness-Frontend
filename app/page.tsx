@@ -5,6 +5,7 @@ import GetInTouch from "@/components/homeComponents/getintouch";
 import AdBanner from "@/components/homeComponents/adbanner";
 import Packages from "@/components/homeComponents/packages";
 import Team from "@/components/homeComponents/team";
+import Testimonial from "@/components/homeComponents/testimonial";
 export const metadata: Metadata = {
   title: "Home Page",
   description: "D-Fitness Home Page",
@@ -18,6 +19,7 @@ export default function Home() {
       <AdBanner />
       <Packages />
       <Team />
+      <Testimonial/>
       <GetInTouch />
     </>
   );
