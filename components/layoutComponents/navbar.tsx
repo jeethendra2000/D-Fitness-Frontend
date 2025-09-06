@@ -28,8 +28,8 @@ export default function Navbar() {
         {/* <li className={pathname === "/dashboard" ? "active" : ""}>
           <a href="/dashboard">Dashboard</a>
         </li> */}
-        <li className={pathname === "/login" ? "active" : ""}>
-          <a href="/login">Login/signup</a>
+        <li className={pathname === "/auth/login" ? "active" : ""}>
+          <a href="/auth/login">Login/signup</a>
         </li>
       </ul>
     </nav>
