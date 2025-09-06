@@ -6,5 +6,6 @@ export const navItemsList = [
   { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
   { href: "/about", label: "About Us" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/auth/login", label: "Login" },
+  // { href: "/dashboard", label: "Dashboard" },
 ];
