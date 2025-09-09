@@ -12,9 +12,12 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 interface MyPassFieldProps {
     label: string;
+    name?: string;
+    value?: string;
+    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function MyPassField({ label }: MyPassFieldProps) {
+export default function MyPassField({ label, name, value, onChange }: MyPassFieldProps) {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -29,7 +32,7 @@ export default function MyPassField({ label }: MyPassFieldProps) {
 
     return (        
         <div className="password-input d-flex align-center w-100 h-46px mb-20px">
-            <input type={showPassword ? 'text' : 'password'} placeholder={label} style={{position: 'relative'}} />
+            <input name={name} type={showPassword ? 'text' : 'password'} placeholder={label} value={value} onChange={onChange} style={{position: 'relative'}} aria-label={label} />
             <IconButton
                   aria-label={
                     showPassword ? 'hide the password' : 'display the password'
