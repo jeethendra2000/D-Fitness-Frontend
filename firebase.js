@@ -11,17 +11,6 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-// const firebaseConfig = {
-//   apiKey: "AIzaSyDk_lmEBDUZkLdzvkStNf7amwkwKa6JQ2Q",
-//   authDomain: "d-fitness7.firebaseapp.com",
-//   projectId: "d-fitness7",
-//   storageBucket: "d-fitness7.firebasestorage.app",
-//   messagingSenderId: "463796648919",
-//   appId: "1:463796648919:web:7ea732bfb27d5228abe992",
-//   measurementId: "G-N6WKH91MHD",
-//   databaseURL: "https://d-fitness7-default-rtdb.firebaseio.com/"
-// };
-
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
