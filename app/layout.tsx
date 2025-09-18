@@ -7,6 +7,7 @@ import Header from "@/components/layoutComponents/header";
 import Footer from "@/components/layoutComponents/footer";
 import Loader from "@/components/utilityComponents/loader";
 import Search from "@/components/layoutComponents/search";
+import ToastProvider from "@/components/utilityComponents/ToastProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
         <Header />
         <AppRouterCacheProvider>
           <main>{children}</main>
+          <ToastProvider />
         </AppRouterCacheProvider>
         <Search />
         <Footer />
