@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import MyPassField from "@/components/authComponents/passField";
+import LoginClient from "@/components/authComponents/LoginClient";
+
 export const metadata: Metadata = {
   title: "Login",
   description: "Login/SignIn for D-Fitness Website",
@@ -14,19 +14,11 @@ export default async function login() {
           <div className="row">
             <div className="col-lg-6 justify-center mx-auto my-5">
               <div className="leave-comment">
-                <form action="#">
                   <div className="section-title contact-title mt-5">
                     {/* <span>Login</span> */}
                     <h2>LOGIN TO YOUR ACCOUNT</h2>
                   </div>
-                  <input type="text" placeholder="Email" />
-                  <MyPassField label="Password" />
-                  <div className="flex justify-between mb-5">
-                    <p>Don't have an account? <a href="/auth/signup" style={{ color: "#ff1313" }}>Register</a></p>
-                    <p><Link href="/forgot-password" style={{ color: "#ff1313" }}>Forgot Password</Link></p>
-                  </div>
-                  <button type="submit">Login</button>
-                </form>
+                  <LoginClient />
               </div>
             </div>
           </div>

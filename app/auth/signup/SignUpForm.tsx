@@ -6,6 +6,10 @@ import { auth, db } from "@/firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { permission } from "process";
 import { useRouter } from "next/navigation";
+import CircularProgress from '@mui/material/CircularProgress';  
+
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -38,7 +42,8 @@ export default function SignUpForm() {
     const errs = validate();
     if (errs.length) {
       setErrors(errs);
-      console.log(errs);
+      console.log('Errors: ',errs);
+      errs.forEach((err) => toast.error(err, { autoClose: 3000 }));
       return;
     }
 
@@ -67,12 +72,14 @@ export default function SignUpForm() {
           });
         } catch (error) {
           console.error("Error creating profile:", error);
+          toast.warn("Account created, but failed to create profile. Please contact support.", { autoClose: 5000 });
         }
-
+        
+        toast.success("Registration successful! Please log in.", { autoClose: 3000 });
         router.push("/auth/login");
       } catch (error: any) {
         console.error("Error during registration:", error);
-        setErrors([error.message || "Registration failed. Please try again."]);
+        toast.error(error.message || "Registration failed. Please try again.", { autoClose: 4000 });
       } finally {
         setLoading(false);
       }
@@ -91,20 +98,21 @@ export default function SignUpForm() {
                             {/* <p>Create an account if you are a new user</p> */}
                             <h2>CREATE YOUR ACCOUNT</h2>
                         </div>
-
-                        {errors.length > 0 && (
+                        
+                        {/* Error is being displayed above the inputs */}
+                        {/* {errors.length > 0 && (
                             <div style={{ color: "#ff4d4f", marginBottom: 12 }}>
                                 {errors.map((err, i) => (
                                     <div key={i}>{err}</div>
                                 ))}
                             </div>
-                        )}
+                        )} */}
 
                         <input type="text" placeholder="First Name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} aria-label="First Name" />
 
                         <input type="text" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} aria-label="Last Name"/>
 
-                        <input type="text" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email"/>
+                        <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email"/>
 
                         <MyPassField label="New Password" name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
                         <MyPassField label="Confirm Password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
@@ -112,7 +120,7 @@ export default function SignUpForm() {
                         <div className="flex justify-center mb-4">
                             <p>Have an account? <a href="/auth/login" style={{ color: "#ff1313" }}>Login</a></p>
                         </div>
-                        <button type="submit" disabled={loading}>{ loading ? "Creating Account..." : "Create Account"}</button>
+                        <button type="submit" disabled={loading}>{ loading ? <CircularProgress sx={{ color: "#ff1313" }} /> : "Create Account"}</button>
                     </form>
                 </div>
             </div>
@@ -123,3 +131,4 @@ export default function SignUpForm() {
     </>
   );
 }
+
