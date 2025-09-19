@@ -10,7 +10,6 @@ export default async function Dashboard() {
   return (
     <>
       <Breadcrumb title="Trainer Dashboard"/>
-      <h1>Trainer Dashboard</h1>
     </>
   );
 }
