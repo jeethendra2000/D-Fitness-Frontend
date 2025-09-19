@@ -9,6 +9,8 @@ import { auth, googleProvider, microsoftProvider } from "@/firebase";
 import MyPassField from "@/components/authComponents/passField";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 export default function LoginClient() {
     const router = useRouter();
@@ -32,7 +34,7 @@ export default function LoginClient() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "tokenId": idToken, "remember": true }),
-                // credentials: "include", // Allow cookies (session cookie) if backend sets it
+                credentials: "include", // Allow cookies (session cookie) if backend sets it
             });
 
             if(!resp.ok) {
@@ -49,6 +51,7 @@ export default function LoginClient() {
             if (role === "admin") router.push("/dashboard/admin");
             else if (role === "trainer") router.push("/dashboard/trainer");
             else router.push("/dashboard/customer");
+
         }catch(err:any){
             console.log('Error: ',err);
             toast.error(err.message || "Login failed", { autoClose: 3000 });
@@ -65,7 +68,7 @@ export default function LoginClient() {
             <p>Don't have an account? <a href="/auth/signup" style={{ color: "#ff1313" }}>Register</a></p>
             <p><Link href="/forgot-password" style={{ color: "#ff1313" }}>Forgot Password</Link></p>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">{ loading ? <CircularProgress /> : "Login"}</button>
         </form>
     );
 }

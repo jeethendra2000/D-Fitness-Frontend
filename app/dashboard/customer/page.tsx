@@ -10,7 +10,6 @@ export default async function Dashboard() {
   return (
     <>
       <Breadcrumb title="Customer Dashboard"/>
-      <h1>Customer Dashboard</h1>
     </>
   );
 }
