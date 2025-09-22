@@ -62,7 +62,7 @@ export default function SignUpForm() {
 
         try {
           const idToken = await user.getIdToken();
-          await fetch(`${backendUrl}/api/auth/create-profile/`, {
+          await fetch(`${backendUrl}/auth/create-profile/`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -73,6 +73,31 @@ export default function SignUpForm() {
         } catch (error) {
           console.error("Error creating profile:", error);
           toast.warn("Account created, but failed to create profile. Please contact support.", { autoClose: 5000 });
+        }
+
+        try{
+          const idToken = await user.getIdToken();
+          const resp = await fetch(`${backendUrl}/auth/users/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              "firebase_uid": user.uid,
+              "email": user.email,
+              "first_name": firstName,
+              "last_name": lastName,
+            }),
+          });
+
+          if(!resp.ok){
+            const errBody = await resp.json().catch(() => ({}));
+            throw new Error(errBody.detail || 'Failed to create user in backend');
+          }
+        }catch(err:any){
+          console.error("Error creating user in backend:", err);
+          toast.warn("Account created, but failed to sync with backend. Please contact support.", { autoClose: 5000 });
         }
         
         toast.success("Registration successful! Please log in.", { autoClose: 3000 });
