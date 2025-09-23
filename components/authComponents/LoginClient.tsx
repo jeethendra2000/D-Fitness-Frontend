@@ -30,7 +30,7 @@ export default function LoginClient() {
             const idToken = await userCred.user.getIdToken();
 
             // Send token to backend login endpoint. Include remember flag if you want session cookie
-            const resp = await fetch(`${backendURL}/api/auth/login/`, {
+            const resp = await fetch(`${backendURL}/auth/login/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ "tokenId": idToken, "remember": true }),
