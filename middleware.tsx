@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
     }
 
     try{
-        const resp = await fetch(`${BACKEND_URL}/api/auth/verify-session/`, {
+        const resp = await fetch(`${BACKEND_URL}/auth/verify-session/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
