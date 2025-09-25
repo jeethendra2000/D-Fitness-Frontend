@@ -12,7 +12,7 @@ export default function Header() {
             <div className="row">
                 <div className="col-lg-3">
                     <div className="logo">
-                        <Link href="./index.html">
+                        <Link href="/">
                              <Image src="/img/logo.png" width={150} height={150} alt="Picture of the author"/>
                         </Link>
                     </div>

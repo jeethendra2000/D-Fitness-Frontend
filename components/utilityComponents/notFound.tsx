@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <>
@@ -14,7 +16,7 @@ export default function NotFound() {
                             <input type="text" placeholder="Enter your keyword"/>
                             <button type="submit"><i  className="fa fa-search"></i></button>
                         </form>
-                        <a href="./index.html"><i  className="fa fa-home"></i> Go back home</a>
+                        <Link href="/"><i  className="fa fa-home"></i> Go back home</Link>
                     </div>
                 </div>
             </div>

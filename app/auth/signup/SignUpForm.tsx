@@ -51,14 +51,14 @@ export default function SignUpForm() {
 
     try {
         const { user } = await createUserWithEmailAndPassword(auth, email, newPassword);
-        await setDoc(doc(db, "users", user.uid), {
-          role: "customer",
-          permissions: [],
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          createdBy: user.uid,
-          updatedBy: user.uid
-        });
+        // await setDoc(doc(db, "users", user.uid), {
+        //   role: "customer",
+        //   permissions: [],
+        //   createdAt: serverTimestamp(),
+        //   updatedAt: serverTimestamp(),
+        //   createdBy: user.uid,
+        //   updatedBy: user.uid
+        // });
 
         try {
           const idToken = await user.getIdToken();
@@ -68,7 +68,12 @@ export default function SignUpForm() {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${idToken}`,
             },
-            body: JSON.stringify({ uid: user.uid, email: user.email }),
+            body: JSON.stringify({ 
+              uid: user.uid, 
+              email: user.email,
+              first_name: firstName,
+              last_name: lastName
+            }),
           });
         } catch (error) {
           console.error("Error creating profile:", error);
