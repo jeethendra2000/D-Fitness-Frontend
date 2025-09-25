@@ -51,14 +51,6 @@ export default function SignUpForm() {
 
     try {
         const { user } = await createUserWithEmailAndPassword(auth, email, newPassword);
-        // await setDoc(doc(db, "users", user.uid), {
-        //   role: "customer",
-        //   permissions: [],
-        //   createdAt: serverTimestamp(),
-        //   updatedAt: serverTimestamp(),
-        //   createdBy: user.uid,
-        //   updatedBy: user.uid
-        // });
 
         try {
           const idToken = await user.getIdToken();
