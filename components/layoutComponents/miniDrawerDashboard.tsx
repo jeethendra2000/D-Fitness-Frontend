@@ -23,7 +23,7 @@ import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { adminSidebarItemsList } from "@/configs/adminSidebarList";
-
+import Badge from "@mui/material/Badge";
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -149,7 +149,9 @@ export default function MiniDrawerDashboard({
           {/* Right side icons */}
           <Box sx={{ ml: "auto", display: "flex", gap: 2 }}>
             <IconButton color="inherit">
-              <NotificationsIcon />
+              <Badge color="error" badgeContent={1} max={10} showZero>
+                <NotificationsIcon />
+              </Badge>
             </IconButton>
             <IconButton color="inherit">
               <AccountCircleIcon />
