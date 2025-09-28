@@ -1,3 +1,4 @@
+
 import Breadcrumb from "@/components/sections/breadcrumb";
 import type { Metadata } from "next";
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 export default async function Dashboard() {
   return (
     <>
-      <Breadcrumb title="Admin Dashboard"/>
+        <Breadcrumb title="Admin"/>
     </>
   );
 }

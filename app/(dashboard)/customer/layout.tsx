@@ -24,6 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     const body = await resp.json();
     const role = body?.role || "customer";
 
+    // return <>{children}</>
     return (
       <>
         {role === "admin" && <header>Admin header / nav</header>}
