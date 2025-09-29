@@ -5,9 +5,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import Header from "@/components/layoutComponents/header";
 import Footer from "@/components/layoutComponents/footer";
-import Loader from "@/components/utilityComponents/loader";
+import Loader from "@/components/utilityComponents/Loader";
 import Search from "@/components/layoutComponents/search";
 import ToastProvider from "@/components/utilityComponents/ToastProvider";
+import SiteShell from "@/components/layoutComponents/SiteShell";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,13 +64,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* <Loader/> */}
-        <Header />
+        {/* <Header /> */}
         <AppRouterCacheProvider>
-          <main>{children}</main>
+          {/* <main>{children}</main> */}
+          <SiteShell>{children}</SiteShell>
           <ToastProvider />
         </AppRouterCacheProvider>
         <Search />
-        <Footer />
+        {/* <Footer /> */}
 
         {/* JS Files */}
         <Script src="/js/jquery-3.3.1.min.js" strategy="beforeInteractive" />
