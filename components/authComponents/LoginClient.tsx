@@ -10,15 +10,19 @@ import MyPassField from "@/components/authComponents/passField";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import CircularProgress from '@mui/material/CircularProgress';
+import Loader from "@/components/utilityComponents/Loader";
 
 
 export default function LoginClient() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [redirecting, setRedirecting] = useState(false); 
     const backendURL = process.env.NEXT_PUBLIC_API_BASE;
     
     async function handleLoginSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if(loading) return; // Prevent multiple clicks
+        if (loading || redirecting) return;
         setLoading(true);
         try{
             const form = e.currentTarget;
@@ -45,12 +49,22 @@ export default function LoginClient() {
             const data = await resp.json();
             console.log("Data: ",data);
             const role = data?.customClaims?.role || "customer";
-            toast.success("Login successful!", { autoClose: 2000 });
+            toast.success("Login successful!", { autoClose: 1500 });
 
-            // Route by role (server middleware also enforces)
-            if (role === "admin") router.push("/dashboard/admin");
-            else if (role === "trainer") router.push("/dashboard/trainer");
-            else router.push("/dashboard/customer");
+            // Show full-screen loader while navigating
+            setRedirecting(true);
+
+            // Allow cookie write to settle
+            await new Promise(r => setTimeout(r, 100));
+
+            const target =
+              role === "admin"
+                ? "/dashboard/admin"
+                : role === "trainer"
+                ? "/dashboard/trainer"
+                : "/dashboard/customer";
+
+            router.replace(target);
 
         }catch(err:any){
             console.log('Error: ',err);
@@ -61,14 +75,17 @@ export default function LoginClient() {
     }
 
     return (
-        <form onSubmit={handleLoginSubmit}>
-            <input type="text" placeholder="Email" name="email" />
-            <MyPassField label="Password" name="password" />
-            <div className="flex justify-between mb-5">
-            <p>Don't have an account? <a href="/auth/signup" style={{ color: "#ff1313" }}>Register</a></p>
-            <p><Link href="/forgot-password" style={{ color: "#ff1313" }}>Forgot Password</Link></p>
-            </div>
-            <button type="submit">{ loading ? <CircularProgress /> : "Login"}</button>
-        </form>
+        <>
+            {redirecting && <Loader message="Loading your dashboard..." dimBackground={true} />}
+            <form onSubmit={handleLoginSubmit} aria-disabled={loading || redirecting}>
+                <input type="text" placeholder="Email" name="email" disabled={loading || redirecting} />
+                <MyPassField label="Password" name="password" />
+                <div className="flex justify-between mb-5">
+                <p>Don't have an account? <a href="/auth/signup" style={{ color: "#ff1313" }}>Register</a></p>
+                <p><Link href="/forgot-password" style={{ color: "#ff1313" }}>Forgot Password</Link></p>
+                </div>
+                <button type="submit" disabled={loading || redirecting}>{ loading ? <CircularProgress style={{color: "#fff", fontSize: 10 }} /> : redirecting ? "Redirecting..." : "Login"}</button>
+            </form>
+        </>
     );
 }
