@@ -24,9 +24,9 @@ export default async function Team() {
                   <span>Our Team</span>
                   <h2>TRAIN WITH EXPERTS</h2>
                 </div>
-                <a href="#" className="primary-btn btn-normal appoinment-btn">
+                {/* <a href="#" className="primary-btn btn-normal appoinment-btn">
                   appointment
-                </a>
+                </a> */}
               </div>
             </div>
           </div>

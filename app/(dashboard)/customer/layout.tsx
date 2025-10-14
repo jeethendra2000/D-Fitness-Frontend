@@ -43,6 +43,7 @@ export default async function DashboardLayout({
     const body = await resp.json().catch(() => ({}));
     const role = body?.role || "customer";
 
+    // return <>{children}</>
     return (
       <>
         <RoleHeader role={role} />
