@@ -2,6 +2,7 @@ import Navbar from "@/components/layoutComponents/navbar";
 import Sidebar from "@/components/layoutComponents/sidebar";
 import Image from 'next/image';
 import Link from "next/link";
+import AuthStatusMenu from "../authComponents/AuthStatusMenu";
 
 export default function Header() {
   return (
@@ -31,6 +32,7 @@ export default function Header() {
                             <Link href="#"><i className="fa fa-youtube-play"></i></Link>
                             <Link href="#"><i className="fa fa-instagram"></i></Link>
                         </div>
+                        {/* <AuthStatusMenu /> */}
                     </div>
                 </div>
             </div>
