@@ -8,18 +8,19 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import MailIcon from "@mui/icons-material/Mail";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-
+import InfoIcon from "@mui/icons-material/Info";
 
 // Admin Sidebar Items list
 export const adminSidebarItemsList = [
-  { label: "Dashboard", href: "/dashboard/admin", icon: DashboardIcon },
-  { label: "Customers", href: "/dashboard/admin/customers", icon: GroupIcon },
-  { label: "Trainers", href: "/dashboard/admin/trainers", icon: FitnessCenterIcon },
-  { label: "Employees", href: "/dashboard/admin/employees", icon: BadgeIcon },
-  { label: "Memberships", href: "/dashboard/admin/memberships", icon: CardMembershipIcon },
-  { label: "Subscriptions", href: "/dashboard/admin/subscriptions", icon: SubscriptionsIcon },
-  { label: "Transactions", href: "/dashboard/admin/transactions", icon: AccountBalanceIcon },
-  { label: "Enquiries", href: "/dashboard/admin/enquiries", icon: MailIcon },
-  { label: "Feedback", href: "/dashboard/admin/feedback", icon: FeedbackIcon },
-  { label: "Offers", href: "/dashboard/admin/offers", icon: LocalOfferIcon },
+  { label: "Dashboard", href: "/admin/dashboard", icon: DashboardIcon },
+  { label: "Customers", href: "/admin/customers", icon: GroupIcon },
+  { label: "Trainers", href: "/admin/trainers", icon: FitnessCenterIcon },
+  { label: "Employees", href: "/admin/employees", icon: BadgeIcon },
+  { label: "Memberships", href: "/admin/memberships", icon: CardMembershipIcon },
+  { label: "Subscriptions", href: "/admin/subscriptions", icon: SubscriptionsIcon },
+  { label: "Transactions", href: "/admin/transactions", icon: AccountBalanceIcon },
+  { label: "Enquiries", href: "/admin/enquiries", icon: MailIcon },
+  { label: "Feedback", href: "/admin/feedback", icon: FeedbackIcon },
+  { label: "Offers", href: "/admin/offers", icon: LocalOfferIcon },
+  { label: "About", href: "/admin/about", icon: InfoIcon },
 ];
