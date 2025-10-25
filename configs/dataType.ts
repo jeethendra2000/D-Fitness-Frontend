@@ -1,3 +1,13 @@
+export type ApiResponse<T> = {
+  data: T[];
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
 export type Role = {
   id: string;
 };
@@ -31,12 +41,11 @@ export type Customer = {
   role: Role;
 };
 
-export type ApiResponse = {
-  data: Customer[];
-  totalCount: number;
-  totalPages: number;
-  currentPage: number;
-  pageSize: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
+export type Membership = {
+  id: string;
+  name: string;
+  amount: number;
+  duration: number; // e.g. number of days
+  description: string;
+  subscriptions: any[]; // replace `any` with a proper Subscription type later if you have one
 };
