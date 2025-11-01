@@ -1,4 +1,3 @@
-// src/components/tables/GenericCrudTable.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -18,6 +17,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 interface GenericCrudTableProps<T extends { id: string }> {
   title: string;
@@ -26,7 +26,8 @@ interface GenericCrudTableProps<T extends { id: string }> {
   initialFormData: T;
   renderForm: (
     data: T,
-    setData: React.Dispatch<React.SetStateAction<T>>
+    setData: React.Dispatch<React.SetStateAction<T>>,
+    readOnly?: boolean
   ) => React.ReactNode;
 }
 
@@ -41,6 +42,7 @@ export default function GenericCrudTable<T extends { id: string }>({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<T | null>(null);
+  const [viewData, setViewData] = useState<T | null>(null);
   const [formData, setFormData] = useState<T>(initialFormData);
 
   const theme = useTheme();
@@ -75,6 +77,11 @@ export default function GenericCrudTable<T extends { id: string }>({
     setOpen(true);
   };
 
+  const handleView = (row: T) => {
+    setViewData(row);
+    setOpen(true);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this record?")) return;
     await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
@@ -82,20 +89,32 @@ export default function GenericCrudTable<T extends { id: string }>({
   };
 
   const handleSubmit = async () => {
-    const method = editData ? "PUT" : "POST";
-    const url = editData ? `${apiUrl}/${editData.id}` : apiUrl;
-
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-
-    if (res.ok) {
-      fetchData();
-      setOpen(false);
+    if (!editData) {
+      // Create
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        fetchData();
+        setOpen(false);
+      } else {
+        alert("Failed to create record");
+      }
     } else {
-      alert("Failed to save data");
+      // Update
+      const res = await fetch(`${apiUrl}/${editData.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        fetchData();
+        setOpen(false);
+      } else {
+        alert("Failed to update record");
+      }
     }
   };
 
@@ -103,9 +122,12 @@ export default function GenericCrudTable<T extends { id: string }>({
     field: "actions",
     headerName: "Actions",
     sortable: false,
-    flex: 0.5,
+    flex: 0.8,
     renderCell: (params: GridRenderCellParams<T>) => (
       <Box>
+        <IconButton color="primary" onClick={() => handleView(params.row)}>
+          <VisibilityIcon />
+        </IconButton>
         <IconButton color="primary" onClick={() => handleEdit(params.row)}>
           <EditIcon />
         </IconButton>
@@ -116,13 +138,15 @@ export default function GenericCrudTable<T extends { id: string }>({
     ),
   };
 
+  const isReadOnly = !!viewData;
+
   return (
     <Box sx={{ p: 2, backgroundColor: "#fff", borderRadius: 2 }}>
       {/* --- HEADER BAR --- */}
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between", // 👈 pushes Add button to the right
+          justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
           mb: 2,
@@ -131,15 +155,11 @@ export default function GenericCrudTable<T extends { id: string }>({
         <Typography variant="h5" sx={{ fontWeight: 600, mb: isMobile ? 1 : 0 }}>
           {title}
         </Typography>
-
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleAdd}
-          sx={{
-            borderRadius: "8px",
-            fontWeight: 600,
-          }}
+          sx={{ borderRadius: "8px", fontWeight: 600 }}
         >
           Add
         </Button>
@@ -159,14 +179,42 @@ export default function GenericCrudTable<T extends { id: string }>({
       </Box>
 
       {/* --- DIALOG --- */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>{editData ? `Edit ${title}` : `Add ${title}`}</DialogTitle>
-        <DialogContent>{renderForm(formData, setFormData)}</DialogContent>
+      <Dialog
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setViewData(null);
+        }}
+        fullWidth
+      >
+        <DialogTitle>
+          {isReadOnly
+            ? `View ${title}`
+            : editData
+            ? `Edit ${title}`
+            : `Add ${title}`}
+        </DialogTitle>
+        <DialogContent>
+          {renderForm(
+            isReadOnly ? (viewData as T) : formData,
+            setFormData,
+            isReadOnly
+          )}
+        </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit}>
-            {editData ? "Update" : "Create"}
+          <Button
+            onClick={() => {
+              setOpen(false);
+              setViewData(null);
+            }}
+          >
+            Close
           </Button>
+          {!isReadOnly && (
+            <Button variant="contained" onClick={handleSubmit}>
+              {editData ? "Update" : "Create"}
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </Box>
