@@ -14,11 +14,23 @@ import InfoIcon from "@mui/icons-material/Info";
 export const adminSidebarItemsList = [
   { label: "Dashboard", href: "/admin/dashboard", icon: DashboardIcon },
   { label: "Customers", href: "/admin/customers", icon: GroupIcon },
-  { label: "Trainers", href: "/admin/trainers", icon: FitnessCenterIcon },
   { label: "Employees", href: "/admin/employees", icon: BadgeIcon },
-  { label: "Memberships", href: "/admin/memberships", icon: CardMembershipIcon },
-  { label: "Subscriptions", href: "/admin/subscriptions", icon: SubscriptionsIcon },
-  { label: "Transactions", href: "/admin/transactions", icon: AccountBalanceIcon },
+  { label: "Trainers", href: "/admin/trainers", icon: FitnessCenterIcon },
+  {
+    label: "Memberships",
+    href: "/admin/memberships",
+    icon: CardMembershipIcon,
+  },
+  {
+    label: "Subscriptions",
+    href: "/admin/subscriptions",
+    icon: SubscriptionsIcon,
+  },
+  {
+    label: "Transactions",
+    href: "/admin/transactions",
+    icon: AccountBalanceIcon,
+  },
   { label: "Enquiries", href: "/admin/enquiries", icon: MailIcon },
   { label: "Feedback", href: "/admin/feedback", icon: FeedbackIcon },
   { label: "Offers", href: "/admin/offers", icon: LocalOfferIcon },

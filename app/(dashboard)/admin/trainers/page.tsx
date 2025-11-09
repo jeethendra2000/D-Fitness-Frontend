@@ -2,7 +2,7 @@
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
-import { Trainer } from "@/configs/dataType";
+import { Trainer } from "@/configs/dataTypes";
 import { TextField } from "@mui/material";
 
 export default function TrainersPage() {

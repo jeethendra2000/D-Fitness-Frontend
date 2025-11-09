@@ -4,10 +4,9 @@
 import React from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import MembershipForm from "@/components/adminComponents/forms/MembershipForm";
-import { Membership } from "@/configs/dataType";
+import { Membership } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
-import { Trainer } from "@/configs/dataType";
 
 export default function MembershipsPage() {
   const apiUrl = `${API_BASE_URL}/Memberships`; // <-- your API endpoint

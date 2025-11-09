@@ -22,11 +22,11 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import type { Customer } from "@/configs/dataType";
+import type { Customer } from "@/configs/dataTypes";
 
 const phoneRegex = /^[0-9]{10}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const API_URL = "https://dfitnessgym.runasp.net/api/Users";
+const API_URL = "https://dfitnessgym.runasp.net/api/Customers";
 const TOKEN = "YOUR_API_TOKEN_HERE";
 
 export default function Customers() {

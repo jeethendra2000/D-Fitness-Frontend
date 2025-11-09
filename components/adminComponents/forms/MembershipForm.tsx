@@ -3,7 +3,7 @@
 
 import React from "react";
 import { TextField, Box } from "@mui/material";
-import type { Membership } from "@/configs/dataType";
+import type { Membership } from "@/configs/dataTypes";
 
 interface MembershipFormProps {
   data: Membership;

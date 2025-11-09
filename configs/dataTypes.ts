@@ -12,6 +12,15 @@ export type Role = {
   id: string;
 };
 
+export type Employee = {
+  id: string;
+  firebase_UID: string;
+  jobTitle: string;
+  hireDate: string;
+  salary: number;
+  status: string;
+};
+
 export type Trainer = {
   id: string;
   experience: number;
