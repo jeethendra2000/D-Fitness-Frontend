@@ -1,8 +1,7 @@
-// src/app/memberships/page.tsx
 "use client";
 
 import React from "react";
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import MembershipForm from "@/components/adminComponents/forms/MembershipForm";
 import { Membership, MembershipType, Status } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
@@ -15,10 +14,12 @@ export default function MembershipsPage() {
     { field: "name", headerName: "Name", flex: 1, minWidth: 120 },
     {
       field: "amount",
-      headerName: "Amount (₹)",
+      headerName: "Amount", // Simplified header name
       flex: 0.5,
+      minWidth: 100,
       type: "number",
-      minWidth: 120,
+      renderCell: (params: GridRenderCellParams<Membership, number>) =>
+        params.value != null ? `₹${params.value.toFixed(2)}` : "₹0.00",
     },
     {
       field: "duration",

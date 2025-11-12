@@ -20,10 +20,12 @@ export default function EmployeesPage() {
     { field: "jobTitle", headerName: "Job Title", flex: 0.5, minWidth: 100 },
     {
       field: "salary",
-      headerName: "Salary (₹)",
+      headerName: "Salary", // Simplified header name
       flex: 0.4,
       minWidth: 100,
       type: "number",
+      renderCell: (params: GridRenderCellParams<Employee, number>) =>
+        params.value != null ? `₹${params.value.toFixed(2)}` : "₹0.00",
     },
     {
       field: "hireDate",

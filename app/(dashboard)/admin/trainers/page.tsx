@@ -25,10 +25,12 @@ export default function TrainersPage() {
     },
     {
       field: "salary",
-      headerName: "Salary (₹)",
+      headerName: "Salary", // Simplified header name
       flex: 0.4,
-      minWidth: 120,
+      minWidth: 100,
       type: "number",
+      renderCell: (params: GridRenderCellParams<Trainer, number>) =>
+        params.value != null ? `₹${params.value.toFixed(2)}` : "₹0.00",
     },
     {
       field: "yearsOfExperience",

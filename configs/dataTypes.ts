@@ -7,6 +7,7 @@ export type ApiResponse<T> = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
+
 export enum Status {
   Active = "Active",
   Inactive = "Inactive",
@@ -18,6 +19,32 @@ export enum MembershipType {
   SemiAnnual = "SemiAnnual",
   Annual = "Annual",
 }
+
+export enum TransactionType {
+  SubscriptionPayment = "SubscriptionPayment",
+  Salary = "Salary",
+  Refund = "Refund",
+  Other = "Other",
+}
+
+export enum TransactionStatus {
+  Pending = "Pending",
+  Completed = "Completed",
+  Failed = "Failed",
+  Cancelled = "Cancelled",
+  Refunded = "Refunded",
+}
+export enum EnquiryStatus {
+  New = "New",
+  Contacted = "Contacted",
+  Resolved = "Resolved",
+}
+export enum FeedbackStatus {
+  New = "New",
+  Acknowledged = "Acknowledged",
+  Resolved = "Resolved",
+}
+
 export type Role = {
   id: string;
 };
@@ -77,4 +104,49 @@ export type Subscription = {
   endDate: string;
   status: Status;
   autoRenew: boolean;
+};
+
+export type Transaction = {
+  id: string; // From the example data
+  payerId: string;
+  payeeId: string;
+  amount: number;
+  type: TransactionType;
+  status: TransactionStatus;
+  subscriptionId: string | null;
+  description: string | null;
+  paymentGatewayId: string | null;
+  createdOn: string; // From the example data
+};
+
+export type Enquiry = {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  message: string;
+  status: EnquiryStatus;
+  submittedAt: string;
+};
+
+export type Feedback = {
+  id: string;
+  firebase_UID: string | null;
+  subject: string | null;
+  message: string | null;
+  rating: number | null;
+  status: FeedbackStatus;
+  submittedAt: string;
+};
+
+export type Offer = {
+  id: string;
+  code: string;
+  description: string;
+  // NOTE: Only one of these two fields should be populated at any time.
+  discountPercentage: number | null;
+  discountAmount: number | null;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  status: Status;
 };
