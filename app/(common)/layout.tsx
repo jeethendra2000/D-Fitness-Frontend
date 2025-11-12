@@ -10,7 +10,6 @@ import Search from "@/components/layoutComponents/search";
 import ToastProvider from "@/components/utilityComponents/ToastProvider";
 import SiteShell from "@/components/layoutComponents/SiteShell";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -85,6 +84,10 @@ export default function RootLayout({
         <Script src="/js/jquery.barfiller.js" strategy="afterInteractive" />
         <Script src="/js/jquery.slicknav.js" strategy="afterInteractive" />
         <Script src="/js/main.js" strategy="afterInteractive" />
+        {/* <script
+          async
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCguol9y5YQ2z0b-MTBsfYpimEcIicd4pY&callback=initMap"
+        ></script> */}
       </body>
     </html>
   );

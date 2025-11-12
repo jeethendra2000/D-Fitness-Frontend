@@ -13,7 +13,7 @@ export default function MembershipsPage() {
 
   const columns: GridColDef[] = [
     { field: "name", headerName: "Name", flex: 1 },
-    { field: "amount", headerName: "Amount ($)", flex: 0.6, type: "number" },
+    { field: "amount", headerName: "Amount (₹)", flex: 0.6, type: "number" },
     {
       field: "duration",
       headerName: "Duration (days)",

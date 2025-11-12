@@ -181,36 +181,40 @@ export default function MiniDrawerDashboard({
         <List>
           {adminSidebarItemsList.map(({ label, href, icon: Icon }) => (
             <ListItem key={label} disablePadding sx={{ display: "block" }}>
-              <Tooltip title={!open ? label : label} placement="bottom" disableHoverListener={open}>
-              <ListItemButton component={Link} href={href}
-                sx={[
-                  { minHeight: 48, px: 2.5 },
-                  open
-                    ? { justifyContent: "initial" }
-                    : { justifyContent: "center" },
-                ]}
+              <Tooltip
+                title={!open ? label : label}
+                placement="bottom"
+                disableHoverListener={open}
               >
-                <ListItemIcon
+                <ListItemButton
+                  component={Link}
+                  href={href}
                   sx={[
-                    { minWidth: 0, justifyContent: "center" },
-                    open ? { mr: 3 } : { mr: "auto" },
+                    { minHeight: 48, px: 2.5 },
+                    open
+                      ? { justifyContent: "initial" }
+                      : { justifyContent: "center" },
                   ]}
                 >
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText
-                  primary={label}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
+                  <ListItemIcon
+                    sx={[
+                      { minWidth: 0, justifyContent: "center" },
+                      open ? { mr: 3 } : { mr: "auto" },
+                    ]}
+                  >
+                    <Icon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={label}
+                    sx={[
+                      {
+                        color: "black",
+                        "&:hover": { color: "black" },
+                      },
+                      open ? { opacity: 1 } : { opacity: 0 },
+                    ]}
+                  />
+                </ListItemButton>
               </Tooltip>
             </ListItem>
           ))}

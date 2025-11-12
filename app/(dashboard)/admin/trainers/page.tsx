@@ -1,31 +1,105 @@
 "use client";
+
 import React from "react";
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
-import { Trainer } from "@/configs/dataTypes";
-import { TextField } from "@mui/material";
+import TrainerForm from "@/components/adminComponents/forms/TrainerForm";
+import { Status, Trainer } from "@/configs/dataTypes";
+import { API_BASE_URL } from "@/configs/constants";
 
 export default function TrainersPage() {
-  const apiUrl = "https://dfitnessgym.runasp.net/api/Trainers";
+  const apiUrl = `${API_BASE_URL}/Trainers`;
 
-  const columns: GridColDef[] = [
-    { field: "experience", headerName: "Experience (yrs)", flex: 1 },
-    { field: "availableFrom", headerName: "From", flex: 1 },
-    { field: "availableTo", headerName: "To", flex: 1 },
-    { field: "dateOfBirth", headerName: "DOB", flex: 1 },
-    { field: "gender", headerName: "Gender", flex: 1 },
+  const columns: GridColDef<Trainer>[] = [
+    {
+      field: "firebase_UID",
+      headerName: "Firebase UID",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "specialization",
+      headerName: "Specialization",
+      flex: 0.7,
+      minWidth: 120,
+    },
+    {
+      field: "salary",
+      headerName: "Salary (₹)",
+      flex: 0.4,
+      minWidth: 120,
+      type: "number",
+    },
+    {
+      field: "yearsOfExperience",
+      headerName: "Experience (yrs)",
+      flex: 0.5,
+      minWidth: 120,
+      type: "number",
+    },
+    {
+      field: "hireDate",
+      headerName: "Hire Date",
+      flex: 0.4,
+      minWidth: 120,
+      renderCell: (params: GridRenderCellParams<Trainer, string>) => {
+        if (!params.value) return "";
+        const dateObj = new Date(params.value);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const year = dateObj.getFullYear();
+        return `${day}-${month}-${year}`;
+      },
+    },
+    {
+      field: "availableFrom",
+      headerName: "Available From",
+      flex: 0.45,
+      minWidth: 100,
+      renderCell: (params: GridRenderCellParams<Trainer, string>) => {
+        if (!params.value) return "";
+        const [hourStr, minuteStr] = params.value.split(":");
+        let hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12; // convert 0 → 12
+        return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+      },
+    },
+    {
+      field: "availableTo",
+      headerName: "Available To",
+      flex: 0.45,
+      minWidth: 100,
+      renderCell: (params: GridRenderCellParams<Trainer, string>) => {
+        if (!params.value) return "";
+        const [hourStr, minuteStr] = params.value.split(":");
+        let hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12;
+        return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+      },
+    },
+
+    { field: "status", headerName: "Status", flex: 0.4, minWidth: 100 },
   ];
 
   const initialTrainer: Trainer = {
     id: "",
-    experience: 0,
-    availableFrom: "",
-    availableTo: "",
-    users: [],
-    dateOfBirth: "",
-    gender: 0,
-    joinedDate: "",
-    createdOn: "",
+    firebase_UID: "",
+    jobTitle: "Trainer",
+    hireDate: new Date().toISOString(),
+    salary: 0,
+    status: Status.Active,
+    specialization: "",
+    yearsOfExperience: 0,
+    bio: "",
+    certification: "",
+    rating: 0,
+    availableFrom: "09:00:00",
+    availableTo: "18:00:00",
+    reportsToEmployeeID: null,
   };
 
   return (
@@ -35,44 +109,7 @@ export default function TrainersPage() {
       columns={columns}
       initialFormData={initialTrainer}
       renderForm={(data, setData) => (
-        <>
-          <TextField
-            label="Experience"
-            type="number"
-            value={data.experience}
-            onChange={(e) =>
-              setData({ ...data, experience: Number(e.target.value) })
-            }
-            fullWidth
-            sx={{ mt: 2 }}
-          />
-          <TextField
-            label="Available From"
-            type="time"
-            value={data.availableFrom}
-            onChange={(e) =>
-              setData({ ...data, availableFrom: e.target.value })
-            }
-            fullWidth
-            sx={{ mt: 2 }}
-          />
-          <TextField
-            label="Available To"
-            type="time"
-            value={data.availableTo}
-            onChange={(e) => setData({ ...data, availableTo: e.target.value })}
-            fullWidth
-            sx={{ mt: 2 }}
-          />
-          <TextField
-            label="Date of Birth"
-            type="date"
-            value={data.dateOfBirth}
-            onChange={(e) => setData({ ...data, dateOfBirth: e.target.value })}
-            fullWidth
-            sx={{ mt: 2 }}
-          />
-        </>
+        <TrainerForm data={data} setData={setData} />
       )}
     />
   );

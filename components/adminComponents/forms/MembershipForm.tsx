@@ -22,7 +22,7 @@ export default function MembershipForm({ data, setData }: MembershipFormProps) {
       />
 
       <TextField
-        label="Amount"
+        label="Amount (₹)"
         type="number"
         value={data.amount}
         onChange={(e) => setData({ ...data, amount: Number(e.target.value) })}

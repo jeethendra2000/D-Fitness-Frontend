@@ -12,6 +12,8 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
@@ -45,9 +47,30 @@ export default function GenericCrudTable<T extends { id: string }>({
   const [viewData, setViewData] = useState<T | null>(null);
   const [formData, setFormData] = useState<T>(initialFormData);
 
+  // ✅ Snackbar state
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error" | "info" | "warning";
+  }>({ open: false, message: "", severity: "info" });
+
+  // ✅ Delete confirmation dialog
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    id?: string;
+  }>({ open: false });
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "info" | "warning" = "info"
+  ) => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  /** ✅ Fetch Data */
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -56,6 +79,7 @@ export default function GenericCrudTable<T extends { id: string }>({
       setRows(json.data ?? json);
     } catch (err) {
       console.error("Fetch error:", err);
+      showSnackbar("Failed to fetch data", "error");
     } finally {
       setLoading(false);
     }
@@ -65,56 +89,82 @@ export default function GenericCrudTable<T extends { id: string }>({
     fetchData();
   }, []);
 
+  /** ✅ Add Record */
   const handleAdd = () => {
     setEditData(null);
     setFormData(initialFormData);
     setOpen(true);
   };
 
+  /** ✅ Edit Record */
   const handleEdit = (row: T) => {
     setEditData(row);
     setFormData(row);
     setOpen(true);
   };
 
+  /** ✅ View (Read Only) */
   const handleView = (row: T) => {
     setViewData(row);
     setOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Delete this record?")) return;
-    await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
-    setRows((prev) => prev.filter((r) => r.id !== id));
+  /** ✅ Delete Record */
+  const confirmDelete = (id: string) => {
+    setDeleteDialog({ open: true, id });
   };
 
+  const handleDelete = async () => {
+    if (!deleteDialog.id) return;
+
+    try {
+      const res = await fetch(`${apiUrl}/${deleteDialog.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const errorData = await res.text();
+        showSnackbar(`Delete failed: ${errorData}`, "error");
+        return;
+      }
+
+      setRows((prev) => prev.filter((r) => r.id !== deleteDialog.id));
+      showSnackbar("Deleted successfully", "success");
+    } catch (e) {
+      showSnackbar("Delete error", "error");
+    } finally {
+      setDeleteDialog({ open: false });
+    }
+  };
+
+  /** ✅ Create or Update API */
   const handleSubmit = async () => {
-    if (!editData) {
-      // Create
-      const res = await fetch(apiUrl, {
-        method: "POST",
+    try {
+      const method = editData ? "PATCH" : "POST";
+      const url = editData ? `${apiUrl}/${editData.id}` : apiUrl;
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      if (res.ok) {
-        fetchData();
-        setOpen(false);
-      } else {
-        alert("Failed to create record");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        showSnackbar(`Failed: ${errorText}`, "error");
+        return;
       }
-    } else {
-      // Update
-      const res = await fetch(`${apiUrl}/${editData.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      if (res.ok) {
-        fetchData();
-        setOpen(false);
-      } else {
-        alert("Failed to update record");
-      }
+
+      await fetchData();
+      setOpen(false);
+      setViewData(null);
+      showSnackbar(
+        editData ? "Updated successfully" : "Created successfully",
+        "success"
+      );
+    } catch (err) {
+      showSnackbar("Error submitting form", "error");
+      console.error(err);
     }
   };
 
@@ -122,16 +172,19 @@ export default function GenericCrudTable<T extends { id: string }>({
     field: "actions",
     headerName: "Actions",
     sortable: false,
-    flex: 0.8,
+    flex: 0.5,
+    minWidth: 150,
     renderCell: (params: GridRenderCellParams<T>) => (
       <Box>
         <IconButton color="primary" onClick={() => handleView(params.row)}>
           <VisibilityIcon />
         </IconButton>
+
         <IconButton color="primary" onClick={() => handleEdit(params.row)}>
           <EditIcon />
         </IconButton>
-        <IconButton color="error" onClick={() => handleDelete(params.row.id)}>
+
+        <IconButton color="error" onClick={() => confirmDelete(params.row.id)}>
           <DeleteIcon />
         </IconButton>
       </Box>
@@ -142,43 +195,26 @@ export default function GenericCrudTable<T extends { id: string }>({
 
   return (
     <Box sx={{ p: 2, backgroundColor: "#fff", borderRadius: 2 }}>
-      {/* --- HEADER BAR --- */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          mb: 2,
-        }}
-      >
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: isMobile ? 1 : 0 }}>
-          {title}
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAdd}
-          sx={{ borderRadius: "8px", fontWeight: 600 }}
-        >
+      {/* Header */}
+      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Typography variant="h5">{title}</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
           Add
         </Button>
       </Box>
 
-      {/* --- DATA GRID --- */}
-      <Box sx={{ width: "100%" }}>
-        <DataGrid
-          rows={rows}
-          columns={[...columns, actionColumn]}
-          getRowId={(r) => r.id}
-          loading={loading}
-          autoHeight
-          disableRowSelectionOnClick
-          pageSizeOptions={[5, 10, 20]}
-        />
-      </Box>
+      {/* Data Grid */}
+      <DataGrid
+        rows={rows}
+        columns={[...columns, actionColumn]}
+        getRowId={(r) => r.id}
+        loading={loading}
+        autoHeight
+        disableRowSelectionOnClick
+        pageSizeOptions={[5, 10, 20]}
+      />
 
-      {/* --- DIALOG --- */}
+      {/* Modal (Add/Edit/View) */}
       <Dialog
         open={open}
         onClose={() => {
@@ -194,6 +230,7 @@ export default function GenericCrudTable<T extends { id: string }>({
             ? `Edit ${title}`
             : `Add ${title}`}
         </DialogTitle>
+
         <DialogContent>
           {renderForm(
             isReadOnly ? (viewData as T) : formData,
@@ -201,6 +238,7 @@ export default function GenericCrudTable<T extends { id: string }>({
             isReadOnly
           )}
         </DialogContent>
+
         <DialogActions>
           <Button
             onClick={() => {
@@ -210,6 +248,7 @@ export default function GenericCrudTable<T extends { id: string }>({
           >
             Close
           </Button>
+
           {!isReadOnly && (
             <Button variant="contained" onClick={handleSubmit}>
               {editData ? "Update" : "Create"}
@@ -217,6 +256,41 @@ export default function GenericCrudTable<T extends { id: string }>({
           )}
         </DialogActions>
       </Dialog>
+
+      {/* ✅ Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialog.open}
+        onClose={() => setDeleteDialog({ open: false })}
+      >
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this record?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialog({ open: false })}>
+            Cancel
+          </Button>
+          <Button color="error" variant="contained" onClick={handleDelete}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ✅ Snackbar for clean alerts */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

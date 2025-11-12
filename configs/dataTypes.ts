@@ -7,6 +7,10 @@ export type ApiResponse<T> = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
+export enum Status {
+  Active = "Active",
+  Inactive = "Inactive",
+}
 
 export type Role = {
   id: string;
@@ -23,31 +27,30 @@ export type Employee = {
 
 export type Trainer = {
   id: string;
-  experience: number;
-  availableFrom: string; // "HH:mm:ss" format
-  availableTo: string; // "HH:mm:ss" format
-  users: any[]; // Can be typed if you have user details, else keep any[]
-  dateOfBirth: string; // "YYYY-MM-DD" or placeholder "0001-01-01"
-  gender: number; // 0,1,2 - use enum if you want
-  joinedDate: string;
-  createdOn: string; // ISO datetime string
+  firebase_UID: string;
+  jobTitle: string;
+  hireDate: string; // ISO date
+  salary: number;
+  status: Status;
+  reportsToEmployeeID?: string | null;
+
+  // Trainer-specific fields
+  specialization: string;
+  yearsOfExperience: number;
+  bio?: string | null;
+  certification?: string | null;
+  rating?: number | null;
+  availableFrom?: string | null; // "HH:mm:ss"
+  availableTo?: string | null; // "HH:mm:ss"
 };
 
 export type Customer = {
-  id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  phoneNumber: string;
-  dateOfBirth: string; // "YYYY-MM-DD"
-  gender: number; // 0,1,2 etc.
-  height: number; // in cm
-  weight: number; // in kg
-  trainerRequired: boolean;
-  trainer: Trainer;
-  joinedDate: string; // "YYYY-MM-DD"
-  createdOn: string; // ISO datetime string
-  role: Role;
+  id: string; // From RetrieveCustomerDto (Guid)
+  firebase_UID: string; // Required, max length 100
+  height: number; // Range: 0–300
+  weight: number; // Range: 0–300
+  trainerRequired: boolean; // Default false
+  trainerId: string | null; // Nullable Guid
 };
 
 export type Membership = {

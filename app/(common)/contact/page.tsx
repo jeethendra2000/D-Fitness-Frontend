@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default async function ContactUS() {
   return (
     <>
-      <Breadcrumb title="Contact us"/>
+      <Breadcrumb title="Contact us" />
 
       {/* <!-- Contact Section Begin --> */}
       <section className="contact-section spad">
@@ -60,12 +60,13 @@ export default async function ContactUS() {
 
           <div className="map">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12087.069761554938!2d-74.2175599360452!3d40.767139456514954!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c254b5958982c3%3A0xb6ab3931055a2612!2sEast%20Orange%2C%20NJ%2C%20USA!5e0!3m2!1sen!2sbd!4v1581710470843!5m2!1sen!2sbd"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d995151.6664747568!2d74.91060687812502!3d13.01584400000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba549574cd865ad%3A0x725c42ba1817d759!2sD%20FITNESS%20CENTER!5e0!3m2!1sen!2sin!4v1762932038892!5m2!1sen!2sin"
+              width="600"
               height="550"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
-            />
+            ></iframe>
           </div>
         </div>
       </section>

@@ -1,188 +1,163 @@
 "use client";
-
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Box,
   TextField,
+  Box,
+  Checkbox,
   FormControlLabel,
-  Switch,
-  RadioGroup,
-  Radio,
-  Typography,
+  CircularProgress,
+  Autocomplete,
 } from "@mui/material";
-import type { Customer } from "@/configs/dataTypes"; // Assuming this is your type path
+import type { Customer, Trainer } from "@/configs/dataTypes";
+import { API_BASE_URL } from "@/configs/constants";
 
-// Define the props our form will accept
 interface CustomerFormProps {
-  formData: Omit<
-    Customer,
-    "id" | "trainer" | "joinedDate" | "createdOn" | "role"
-  >;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
-  errors: {
-    firstname: string;
-    lastname: string;
-    email: string;
-    phoneNumber: string;
-  };
-  readOnly?: boolean; // To disable fields if just viewing
+  data: Customer;
+  setData: React.Dispatch<React.SetStateAction<Customer>>;
 }
 
-export default function CustomerForm({
-  formData,
-  setFormData,
-  errors,
-  readOnly = false,
-}: CustomerFormProps) {
-  // Generic handler to update form state
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev: any) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+export default function CustomerForm({ data, setData }: CustomerFormProps) {
+  const [trainers, setTrainers] = useState<Trainer[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Specific handler for number inputs
-  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({
-      ...prev,
-      [name]: value === "" ? "" : Number(value),
-    }));
-  };
+  /** ✅ Fetch Trainers */
+  useEffect(() => {
+    const fetchTrainers = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/Trainers?filterOn=status&filterBy=Active`
+        );
+        const json = await res.json();
+
+        // handle both possible API formats
+        const trainerList = Array.isArray(json)
+          ? json
+          : Array.isArray(json.data)
+          ? json.data
+          : [];
+
+        setTrainers(trainerList);
+      } catch (error) {
+        console.error("Failed to fetch trainers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrainers();
+  }, []);
+
+  const selectedTrainer = trainers.find((t) => t.id === data.trainerId) || null;
 
   return (
-    <Box
-      component="form"
-      sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
       <TextField
-        name="firstname"
-        label="First Name"
-        value={formData.firstname}
-        onChange={handleChange}
+        label="Firebase UID"
+        value={data.firebase_UID}
+        onChange={(e) => setData({ ...data, firebase_UID: e.target.value })}
         fullWidth
         required
-        error={!!errors.firstname}
-        helperText={errors.firstname}
-        InputProps={{
-          readOnly: readOnly,
-        }}
       />
+
       <TextField
-        name="lastname"
-        label="Last Name"
-        value={formData.lastname}
-        onChange={handleChange}
-        fullWidth
-        required
-        error={!!errors.lastname}
-        helperText={errors.lastname}
-        InputProps={{
-          readOnly: readOnly,
-        }}
-      />
-      <TextField
-        name="email"
-        label="Email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        fullWidth
-        required
-        error={!!errors.email}
-        helperText={errors.email}
-        InputProps={{
-          readOnly: readOnly,
-        }}
-      />
-      <TextField
-        name="phoneNumber"
-        label="Phone Number"
-        value={formData.phoneNumber}
-        onChange={handleChange}
-        fullWidth
-        error={!!errors.phoneNumber}
-        helperText={errors.phoneNumber}
-        InputProps={{
-          readOnly: readOnly,
-        }}
-      />
-      <TextField
-        name="dateOfBirth"
-        label="Date of Birth"
-        type="date"
-        value={formData.dateOfBirth}
-        onChange={handleChange}
-        fullWidth
-        InputLabelProps={{ shrink: true }}
-        InputProps={{
-          readOnly: readOnly,
-        }}
-      />
-      <Typography variant="subtitle1">Gender</Typography>
-      <RadioGroup
-        row
-        name="gender"
-        value={formData.gender.toString()}
-        onChange={handleChange}
-      >
-        <FormControlLabel
-          value="0"
-          control={<Radio />}
-          label="Male"
-          disabled={readOnly}
-        />
-        <FormControlLabel
-          value="1"
-          control={<Radio />}
-          label="Female"
-          disabled={readOnly}
-        />
-        <FormControlLabel
-          value="2"
-          control={<Radio />}
-          label="Others"
-          disabled={readOnly}
-        />
-      </RadioGroup>
-      <TextField
-        name="height"
         label="Height (cm)"
         type="number"
-        value={formData.height}
-        onChange={handleNumberChange}
+        value={data.height}
+        onChange={(e) => setData({ ...data, height: Number(e.target.value) })}
         fullWidth
-        InputProps={{
-          readOnly: readOnly,
-        }}
+        required
       />
+
       <TextField
-        name="weight"
         label="Weight (kg)"
         type="number"
-        value={formData.weight}
-        onChange={handleNumberChange}
+        value={data.weight}
+        onChange={(e) => setData({ ...data, weight: Number(e.target.value) })}
         fullWidth
-        InputProps={{
-          readOnly: readOnly,
-        }}
+        required
       />
-      <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-        <FormControlLabel
-          control={
-            <Switch
-              name="trainerRequired"
-              checked={formData.trainerRequired}
-              onChange={handleChange}
-              disabled={readOnly}
-            />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={data.trainerRequired}
+            onChange={(e) =>
+              setData({ ...data, trainerRequired: e.target.checked })
+            }
+          />
+        }
+        label="Trainer Required"
+      />
+
+      {data.trainerRequired && (
+        // <FormControl fullWidth required>
+        //   <InputLabel id="trainer-select-label">Select Trainer</InputLabel>
+        //   {loading ? (
+        //     <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+        //       <CircularProgress size={24} />
+        //     </Box>
+        //   ) : (
+        //     <Select
+        //       labelId="trainer-select-label"
+        //       value={data.trainerId || ""}
+        //       label="Select Trainer"
+        //       onChange={(e) => setData({ ...data, trainerId: e.target.value })}
+        //     >
+        //       {trainers.map((trainer) => (
+        //         <MenuItem key={trainer.id} value={trainer.id}>
+        //           {trainer.jobTitle
+        //             ? `${trainer.jobTitle} (${trainer.firebase_UID})`
+        //             : trainer.firebase_UID}
+        //         </MenuItem>
+        //       ))}
+        //     </Select>
+        //   )}
+        // </FormControl>
+
+        <Autocomplete
+          loading={loading}
+          options={trainers}
+          value={selectedTrainer}
+          getOptionLabel={(option) =>
+            option.jobTitle
+              ? `${option.jobTitle} (${option.firebase_UID})`
+              : option.firebase_UID
           }
-          label="Trainer Required"
-          labelPlacement="start"
+          onChange={(_, newValue) =>
+            setData({
+              ...data,
+              trainerId: newValue?.id ?? null,
+            })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Select Trainer"
+              fullWidth
+              required
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loading ? <CircularProgress size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+          filterOptions={(options, { inputValue }) =>
+            options.filter(
+              (opt) =>
+                opt.firebase_UID
+                  ?.toLowerCase()
+                  .includes(inputValue.toLowerCase()) ||
+                opt.jobTitle?.toLowerCase().includes(inputValue.toLowerCase())
+            )
+          }
         />
-      </Box>
+      )}
     </Box>
   );
 }
