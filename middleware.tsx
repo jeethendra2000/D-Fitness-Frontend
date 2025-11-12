@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
     if(!session) {
         const url = req.nextUrl.clone();
         url.pathname = "/auth/login";
-        return NextResponse.redirect(url);
+        // return NextResponse.redirect(url);
     }
 
     try{
@@ -41,31 +41,31 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(url);
         }
 
-        if(pathname.startsWith("/dashboard/admin") && role !== "admin") {
-            const url = req.nextUrl.clone();
-            url.pathname = "/404";
-            return NextResponse.redirect(url);
-        }
+        // if(pathname.startsWith("/dashboard/admin") && role !== "admin") {
+        //     const url = req.nextUrl.clone();
+        //     url.pathname = "/404";
+        //     return NextResponse.redirect(url);
+        // }
 
-        if(pathname.startsWith("/dashboard/trainer") && role !== "trainer") {
-            const url = req.nextUrl.clone();
-            url.pathname = "/404";
-            return NextResponse.redirect(url);
-        }
+        // if(pathname.startsWith("/dashboard/trainer") && role !== "trainer") {
+        //     const url = req.nextUrl.clone();
+        //     url.pathname = "/404";
+        //     return NextResponse.redirect(url);
+        // }
 
-        if(pathname.startsWith("/dashboard/customer") && role !== "customer") {
-            const url = req.nextUrl.clone();
-            url.pathname = "/404";
-            return NextResponse.redirect(url);
-        }
+        // if(pathname.startsWith("/dashboard/customer") && role !== "customer") {
+        //     const url = req.nextUrl.clone();
+        //     url.pathname = "/404";
+        //     return NextResponse.redirect(url);
+        // }
 
         return NextResponse.next();
     }catch (err){
         console.error("Middleware verify-session error: ", err);
         const url = req.nextUrl.clone();
         url.pathname = "/auth/login";
-        return NextResponse.redirect(url);
+        // return NextResponse.redirect(url);
     }
 }
 
-export const config = { matcher: ["/dashboard/:path*"] };
+// export const config = { matcher: ["/dashboard/:path*"] };

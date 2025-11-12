@@ -19,12 +19,12 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Link from "next/link";
 import Image from "next/image";
-import InfoIcon from "@mui/icons-material/Info";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { adminSidebarItemsList } from "@/configs/adminSidebarList";
 import Badge from "@mui/material/Badge";
-const drawerWidth = 240;
+import Tooltip from "@mui/material/Tooltip";
+const drawerWidth = 200;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -181,61 +181,45 @@ export default function MiniDrawerDashboard({
         <List>
           {adminSidebarItemsList.map(({ label, href, icon: Icon }) => (
             <ListItem key={label} disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={[
-                  { minHeight: 48, px: 2.5 },
-                  open
-                    ? { justifyContent: "initial" }
-                    : { justifyContent: "center" },
-                ]}
+              <Tooltip
+                title={!open ? label : label}
+                placement="bottom"
+                disableHoverListener={open}
               >
-                <ListItemIcon
+                <ListItemButton
+                  component={Link}
+                  href={href}
                   sx={[
-                    { minWidth: 0, justifyContent: "center" },
-                    open ? { mr: 3 } : { mr: "auto" },
+                    { minHeight: 48, px: 2.5 },
+                    open
+                      ? { justifyContent: "initial" }
+                      : { justifyContent: "center" },
                   ]}
                 >
-                  <Icon />
-                </ListItemIcon>
-                <ListItemText
-                  primary={label}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1,
-                        }
-                      : {
-                          opacity: 0,
-                        },
-                  ]}
-                />
-              </ListItemButton>
+                  <ListItemIcon
+                    sx={[
+                      { minWidth: 0, justifyContent: "center" },
+                      open ? { mr: 3 } : { mr: "auto" },
+                    ]}
+                  >
+                    <Icon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={label}
+                    sx={[
+                      {
+                        color: "black",
+                        "&:hover": { color: "black" },
+                      },
+                      open ? { opacity: 1 } : { opacity: 0 },
+                    ]}
+                  />
+                </ListItemButton>
+              </Tooltip>
             </ListItem>
           ))}
         </List>
-        <Divider />
-        <List>
-          <ListItem disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                px: 2.5,
-                justifyContent: open ? "initial" : "center",
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  justifyContent: "center",
-                  mr: open ? 3 : "auto",
-                }}
-              >
-                <InfoIcon />
-              </ListItemIcon>
-              <ListItemText primary="About" sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        </List>
+        {/* <Divider /> */}
       </Drawer>
 
       {/* Main content container */}
@@ -243,14 +227,11 @@ export default function MiniDrawerDashboard({
         component="main"
         sx={{
           flexGrow: 1,
-          p: 2,
+          p: 1,
           transition: theme.transitions.create("margin", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          marginLeft: open
-            ? `${drawerWidth}px`
-            : `calc(${theme.spacing(1)} + 1px)`,
         }}
       >
         <DrawerHeader /> {/* to push content below app bar */}
