@@ -1,31 +1,59 @@
 "use client";
 
 import React from "react";
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import EmployeeForm from "@/components/adminComponents/forms/EmployeeForm";
-import { Employee } from "@/configs/dataTypes";
+import { Employee, Status } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 
 export default function EmployeesPage() {
   const apiUrl = `${API_BASE_URL}/Employees`;
 
-  // ✅ Corrected columns for Employee model
-  const columns: GridColDef[] = [
-    { field: "firebase_UID", headerName: "Firebase UID", flex: 1 },
-    { field: "jobTitle", headerName: "Job Title", flex: 1 },
-    { field: "salary", headerName: "Salary", type: "number", flex: 0.6 },
-    { field: "hireDate", headerName: "Hire Date", flex: 0.8 },
+  const columns: GridColDef<Employee>[] = [
+    {
+      field: "firebase_UID",
+      headerName: "Firebase UID",
+      flex: 1,
+      minWidth: 120,
+    },
+    { field: "jobTitle", headerName: "Job Title", flex: 0.5, minWidth: 100 },
+    {
+      field: "salary",
+      headerName: "Salary (₹)",
+      flex: 0.4,
+      minWidth: 100,
+      type: "number",
+    },
+    {
+      field: "hireDate",
+      headerName: "Hire Date",
+      flex: 0.4,
+      minWidth: 120,
+      renderCell: (params: GridRenderCellParams<Employee, string>) => {
+        if (!params.value) return "";
+        const dateObj = new Date(params.value);
+        const day = String(dateObj.getDate()).padStart(2, "0");
+        const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const year = dateObj.getFullYear();
+        return `${day}-${month}-${year}`;
+      },
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 0.3,
+      minWidth: 80,
+    },
   ];
 
-  // ✅ Initial form data matches Employee type
   const initialEmployee: Employee = {
     id: "",
     firebase_UID: "",
     jobTitle: "",
-    salary: 0,
     hireDate: "",
-    status: "Active",
+    salary: 0,
+    status: Status.Active,
   };
 
   return (
