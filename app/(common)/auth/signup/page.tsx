@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SignUpForm from "@/app/auth/signup/SignUpForm";
+import SignUpForm from "@/app/(common)/auth/signup/SignUpForm";
 
 export const metadata: Metadata = {
   title: "Register",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SignUp() {
-    return <SignUpForm />;
+  return <SignUpForm />;
 }
