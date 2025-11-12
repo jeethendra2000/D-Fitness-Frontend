@@ -68,3 +68,13 @@ export type Membership = {
   type: MembershipType;
   status: Status;
 };
+
+export type Subscription = {
+  id: string;
+  customerId: string;
+  membershipID: string;
+  startDate: string;
+  endDate: string;
+  status: Status;
+  autoRenew: boolean;
+};
