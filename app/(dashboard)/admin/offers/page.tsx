@@ -80,7 +80,6 @@ export default function OfferPage() {
       headerName: "Expires On",
       flex: 1,
       minWidth: 180,
-      // FIX: Explicitly allow null or undefined in the params type
       renderCell: (
         params: GridRenderCellParams<Offer, string | null | undefined>
       ) => {

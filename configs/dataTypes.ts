@@ -34,6 +34,14 @@ export enum TransactionStatus {
   Cancelled = "Cancelled",
   Refunded = "Refunded",
 }
+export enum PaymentMode {
+  Card = "Card",
+  NetBanking = "NetBanking",
+  Cash = "Cash",
+  UPI = "UPI",
+  Wallet = "Wallet",
+  Other = "Other",
+}
 export enum EnquiryStatus {
   New = "New",
   Contacted = "Contacted",
