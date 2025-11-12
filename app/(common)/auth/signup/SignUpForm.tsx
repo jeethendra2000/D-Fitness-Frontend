@@ -1,0 +1,156 @@
+"use client";
+import MyPassField from "@/components/authComponents/passField";
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "@/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { permission } from "process";
+import { useRouter } from "next/navigation";
+import CircularProgress from '@mui/material/CircularProgress';  
+
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
+const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
+
+export default function SignUpForm() {
+  const router = useRouter();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const validate = () => {
+    const newErrors: string[] = [];
+    if (!firstName.trim()) newErrors.push("First name is required.");
+    if (!email.trim()) newErrors.push("Email is required.");
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email && !emailRegex.test(email)) newErrors.push("Invalid email format.");
+    if (!newPassword) newErrors.push("Password is required.");
+    if (!confirmPassword) newErrors.push("Please confirm your password.");
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) newErrors.push("Passwords do not match.");
+    return newErrors;
+  }
+
+  const handleRegistration = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setErrors([]);
+    const errs = validate();
+    if (errs.length) {
+      setErrors(errs);
+      console.log('Errors: ',errs);
+      errs.forEach((err) => toast.error(err, { autoClose: 3000 }));
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+        const { user } = await createUserWithEmailAndPassword(auth, email, newPassword);
+
+        try {
+          const idToken = await user.getIdToken();
+          await fetch(`${backendUrl}/auth/create-profile/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({ 
+              uid: user.uid, 
+              email: user.email,
+              first_name: firstName,
+              last_name: lastName
+            }),
+          });
+        } catch (error) {
+          console.error("Error creating profile:", error);
+          toast.warn("Account created, but failed to create profile. Please contact support.", { autoClose: 5000 });
+        }
+
+        try{
+          const idToken = await user.getIdToken();
+          const resp = await fetch(`${backendUrl}/auth/users/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              "firebase_uid": user.uid,
+              "email": user.email,
+              "first_name": firstName,
+              "last_name": lastName,
+            }),
+          });
+
+          if(!resp.ok){
+            const errBody = await resp.json().catch(() => ({}));
+            throw new Error(errBody.detail || 'Failed to create user in backend');
+          }
+        }catch(err:any){
+          console.error("Error creating user in backend:", err);
+          toast.warn("Account created, but failed to sync with backend. Please contact support.", { autoClose: 5000 });
+        }
+        
+        toast.success("Registration successful! Please log in.", { autoClose: 3000 });
+        router.push("/auth/login");
+      } catch (error: any) {
+        console.error("Error during registration:", error);
+        toast.error(error.message || "Registration failed. Please try again.", { autoClose: 4000 });
+      } finally {
+        setLoading(false);
+      }
+    }
+
+  return (
+    <>
+      <section className="contact-section spad">
+        <div className="container">
+          <div className="row">
+            <div className="col-lg-6 justify-center mx-auto">
+                <div className="leave-comment">
+                    <form onSubmit={handleRegistration}>
+                        <div className="section-title contact-title mt-5 flex justify-center">
+                            {/* <span>REGISTER</span> */}
+                            {/* <p>Create an account if you are a new user</p> */}
+                            <h2>CREATE YOUR ACCOUNT</h2>
+                        </div>
+                        
+                        {/* Error is being displayed above the inputs */}
+                        {/* {errors.length > 0 && (
+                            <div style={{ color: "#ff4d4f", marginBottom: 12 }}>
+                                {errors.map((err, i) => (
+                                    <div key={i}>{err}</div>
+                                ))}
+                            </div>
+                        )} */}
+
+                        <input type="text" placeholder="First Name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} aria-label="First Name" />
+
+                        <input type="text" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} aria-label="Last Name"/>
+
+                        <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email"/>
+
+                        <MyPassField label="New Password" name="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                        <MyPassField label="Confirm Password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+
+                        <div className="flex justify-center mb-4">
+                            <p>Have an account? <a href="/auth/login" style={{ color: "#ff1313" }}>Login</a></p>
+                        </div>
+                        <button type="submit" disabled={loading}>{ loading ? <CircularProgress sx={{ color: "#ff1313" }} /> : "Create Account"}</button>
+                    </form>
+                </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
