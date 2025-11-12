@@ -12,6 +12,12 @@ export enum Status {
   Inactive = "Inactive",
 }
 
+export enum MembershipType {
+  Monthly = "Monthly",
+  Quarterly = "Quarterly",
+  SemiAnnual = "SemiAnnual",
+  Annual = "Annual",
+}
 export type Role = {
   id: string;
 };
@@ -22,7 +28,7 @@ export type Employee = {
   jobTitle: string;
   hireDate: string;
   salary: number;
-  status: string;
+  status: Status;
 };
 
 export type Trainer = {
@@ -56,8 +62,9 @@ export type Customer = {
 export type Membership = {
   id: string;
   name: string;
-  amount: number;
-  duration: number; // e.g. number of days
   description: string;
-  subscriptions: any[]; // replace `any` with a proper Subscription type later if you have one
+  amount: number;
+  duration: number;
+  type: MembershipType;
+  status: Status;
 };

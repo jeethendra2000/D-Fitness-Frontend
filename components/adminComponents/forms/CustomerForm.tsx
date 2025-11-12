@@ -91,30 +91,6 @@ export default function CustomerForm({ data, setData }: CustomerFormProps) {
       />
 
       {data.trainerRequired && (
-        // <FormControl fullWidth required>
-        //   <InputLabel id="trainer-select-label">Select Trainer</InputLabel>
-        //   {loading ? (
-        //     <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-        //       <CircularProgress size={24} />
-        //     </Box>
-        //   ) : (
-        //     <Select
-        //       labelId="trainer-select-label"
-        //       value={data.trainerId || ""}
-        //       label="Select Trainer"
-        //       onChange={(e) => setData({ ...data, trainerId: e.target.value })}
-        //     >
-        //       {trainers.map((trainer) => (
-        //         <MenuItem key={trainer.id} value={trainer.id}>
-        //           {trainer.jobTitle
-        //             ? `${trainer.jobTitle} (${trainer.firebase_UID})`
-        //             : trainer.firebase_UID}
-        //         </MenuItem>
-        //       ))}
-        //     </Select>
-        //   )}
-        // </FormControl>
-
         <Autocomplete
           loading={loading}
           options={trainers}
