@@ -25,7 +25,6 @@ import { adminSidebarItemsList } from "@/configs/adminSidebarList";
 import { customerSidebarItemsList } from "@/configs/customerSidebarList";
 import { trainerSidebarItemsList } from "@/configs/trainerSidebarList";
 
-// 👉 Import usePathname from Next.js
 import { usePathname } from "next/navigation";
 
 import Badge from "@mui/material/Badge";
