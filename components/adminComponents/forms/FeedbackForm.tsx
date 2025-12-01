@@ -8,7 +8,7 @@ import {
   Autocomplete,
   CircularProgress,
 } from "@mui/material";
-import { Feedback, FeedbackStatus } from "@/configs/dataTypes"; // Assumed import
+import { Feedback, FeedbackStatus, Customer } from "@/configs/dataTypes"; // Assumed import
 import { API_BASE_URL } from "@/configs/constants";
 
 interface CustomerOption {
@@ -46,7 +46,7 @@ export default function FeedbackForm({
           : [];
 
         setCustomers(
-          customerList.map((c: any) => ({
+          customerList.map((c: Customer) => ({
             id: c.id,
             firebase_UID: c.firebase_UID,
           }))

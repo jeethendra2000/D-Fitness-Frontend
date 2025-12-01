@@ -22,8 +22,15 @@ import Image from "next/image";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { adminSidebarItemsList } from "@/configs/adminSidebarList";
+import { customerSidebarItemsList } from "@/configs/customerSidebarList";
+import { trainerSidebarItemsList } from "@/configs/trainerSidebarList";
+
+import { usePathname } from "next/navigation";
+
 import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
+
+// --- MUI Style Definitions (Unchanged) ---
 const drawerWidth = 200;
 
 const openedMixin = (theme: Theme): CSSObject => ({
@@ -107,6 +114,13 @@ const Drawer = styled(MuiDrawer, {
     },
   ],
 }));
+// --- End MUI Style Definitions ---
+
+// Helper function to capitalize the first letter
+const capitalize = (s: string) => {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 export default function MiniDrawerDashboard({
   children,
@@ -115,6 +129,35 @@ export default function MiniDrawerDashboard({
 }) {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  // 1. Get the current URL path
+  const pathname = usePathname();
+
+  // 2. Determine the user role based on the path prefix
+  let role = "admin"; // Default to admin
+  if (pathname.startsWith("/customer")) {
+    role = "customer";
+  } else if (pathname.startsWith("/trainer")) {
+    role = "trainer";
+  } else if (pathname.startsWith("/admin")) {
+    role = "admin";
+  }
+
+  // 3. Select the appropriate sidebar list and dashboard title
+  let sidebarItems = adminSidebarItemsList;
+  let dashboardTitle = `${capitalize(role)} Dashboard`;
+
+  switch (role) {
+    case "customer":
+      sidebarItems = customerSidebarItemsList;
+      break;
+    case "trainer":
+      sidebarItems = trainerSidebarItemsList;
+      break;
+    case "admin":
+    default:
+      sidebarItems = adminSidebarItemsList;
+      break;
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -143,8 +186,9 @@ export default function MiniDrawerDashboard({
           >
             <MenuIcon />
           </IconButton>
+          {/* Use the dynamic dashboard title */}
           <Typography variant="h6" noWrap component="div">
-            Admin Dashboard
+            {dashboardTitle}
           </Typography>
           {/* Right side icons */}
           <Box sx={{ ml: "auto", display: "flex", gap: 2 }}>
@@ -166,7 +210,7 @@ export default function MiniDrawerDashboard({
               src="/img/logoNoBG.png"
               width={150}
               height={150}
-              alt="Picture of the author"
+              alt="Logo"
             />
           </Link>
           <IconButton onClick={handleDrawerClose}>
@@ -179,7 +223,8 @@ export default function MiniDrawerDashboard({
         </DrawerHeader>
         <Divider />
         <List>
-          {adminSidebarItemsList.map(({ label, href, icon: Icon }) => (
+          {/* 4. Map over the dynamically selected sidebarItems */}
+          {sidebarItems.map(({ label, href, icon: Icon }) => (
             <ListItem key={label} disablePadding sx={{ display: "block" }}>
               <Tooltip
                 title={!open ? label : label}
@@ -189,6 +234,8 @@ export default function MiniDrawerDashboard({
                 <ListItemButton
                   component={Link}
                   href={href}
+                  // Highlight the active item based on the current pathname
+                  selected={pathname.includes(href)}
                   sx={[
                     { minHeight: 48, px: 2.5 },
                     open

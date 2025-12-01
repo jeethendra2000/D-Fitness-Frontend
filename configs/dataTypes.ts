@@ -121,6 +121,7 @@ export type Transaction = {
   amount: number;
   type: TransactionType;
   status: TransactionStatus;
+  modeOfPayment: PaymentMode;
   subscriptionId: string | null;
   description: string | null;
   paymentGatewayId: string | null;

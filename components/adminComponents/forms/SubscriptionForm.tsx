@@ -10,7 +10,12 @@ import {
   Autocomplete,
   MenuItem,
 } from "@mui/material";
-import { Subscription, Status } from "@/configs/dataTypes";
+import {
+  Subscription,
+  Status,
+  Customer,
+  Membership,
+} from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 
 interface SubscriptionFormProps {
@@ -65,14 +70,14 @@ export default function SubscriptionForm({
           : [];
 
         setCustomers(
-          customerList.map((c: any) => ({
+          customerList.map((c: Customer) => ({
             id: c.id,
             firebase_UID: c.firebase_UID,
           }))
         );
 
         setMemberships(
-          membershipList.map((m: any) => ({
+          membershipList.map((m: Membership) => ({
             id: m.id,
             name: m.name,
           }))

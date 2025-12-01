@@ -12,6 +12,8 @@ import {
   TransactionType,
   TransactionStatus,
   PaymentMode,
+  Transaction,
+  Subscription, 
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 
@@ -26,10 +28,9 @@ interface EmployeeData {
   jobTitle: string;
 }
 
-// FIX: Added missing TransactionFormProps interface
 interface TransactionFormProps {
-  data: any;
-  setData: React.Dispatch<React.SetStateAction<any>>;
+  data: Transaction;
+  setData: React.Dispatch<React.SetStateAction<Transaction>>;
 }
 
 // Unified interface for Payer/Payee selection
@@ -132,7 +133,8 @@ export default function TransactionForm({
         }, {} as Record<string, string>);
 
         setSubscriptions(
-          subscriptionList.map((s: any) => ({
+          subscriptionList.map((s: Subscription) => ({
+            // <-- FIX: Changed any to Subscription
             id: s.id,
             membershipID: s.membershipID,
             membershipName: memNameMap[s.membershipID] || "Unknown",
@@ -163,11 +165,9 @@ export default function TransactionForm({
   const showSubscriptionField =
     data.type === TransactionType.SubscriptionPayment;
 
-  // Cleanup effect: If transaction type changes away from SubscriptionPayment, clear subscriptionId
   useEffect(() => {
     if (!showSubscriptionField && data.subscriptionId !== null) {
-      // FIX: Explicitly type 'prev' as 'any' to resolve TypeScript error 7006
-      setData((prev: any) => ({ ...prev, subscriptionId: null }));
+      setData((prev: Transaction) => ({ ...prev, subscriptionId: null }));
     }
   }, [showSubscriptionField, data.subscriptionId, setData]);
 
