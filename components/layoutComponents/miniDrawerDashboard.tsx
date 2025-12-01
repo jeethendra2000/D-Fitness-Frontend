@@ -144,7 +144,7 @@ export default function MiniDrawerDashboard({
 
   // 3. Select the appropriate sidebar list and dashboard title
   let sidebarItems = adminSidebarItemsList;
-  let dashboardTitle = `${capitalize(role)} Dashboard`;
+  const dashboardTitle = `${capitalize(role)} Dashboard`;
 
   switch (role) {
     case "customer":

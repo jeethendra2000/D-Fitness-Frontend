@@ -8,14 +8,14 @@ import {
   Dumbbell,
   LucideProps,
   Tag,
-  User,
+  User as UserIcon, // Renamed to avoid collision with interface below
   Star,
   List,
   BarChart3,
 } from "lucide-react";
 import { API_BASE_URL } from "@/configs/constants";
-// --- Recharts Imports ---
-// @ts-ignore: Assuming recharts will be installed or correctly resolved at build time
+
+// --- Recharts Imports (assuming installed) ---
 import {
   BarChart,
   Bar,
@@ -30,7 +30,20 @@ import {
   Cell,
 } from "recharts";
 
-// --- Placeholder for API Data Structure ---
+interface Transaction {
+  status: string;
+  amount: number;
+  createdOn: string;
+}
+
+interface Subscription {
+  status: string;
+}
+
+interface Enquiry {
+  status: string;
+}
+
 interface DashboardData {
   // Core Metrics
   totalCustomers: number;
@@ -95,12 +108,14 @@ const formatCurrency = (amount: number) => {
 };
 
 // --- Core Aggregation Logic ---
+// FIX 1: transactions array is now correctly typed
 const calculateRevenueByMonth = (
-  transactions: any[]
+  transactions: Transaction[]
 ): MonthlyRevenueDataPoint[] => {
   const revenueMap: Record<string, number> = {}; // Key: YYYY-MM
 
   transactions.forEach((tx) => {
+    // tx is now implicitly Transaction
     // Only aggregate completed transactions with an amount and valid date
     if (tx.status === "Completed" && tx.amount > 0 && tx.createdOn) {
       const date = new Date(tx.createdOn);
@@ -188,22 +203,24 @@ export default function AdminDashboardPage() {
         const totalTransactions = transactionData.length;
 
         const activeSubscriptions = subscriptionData.filter(
-          (sub: any) => sub.status === "Active"
+          (sub: Subscription) => sub.status === "Active"
         ).length;
 
         const totalFeedbacks = feedbackData.length;
 
         const pendingEnquiries = enquiryData.filter(
-          (enq: any) => enq.status === "New"
+          (enq: Enquiry) => enq.status === "New"
         ).length;
 
-        const monthlyRevenue = transactionData.reduce(
-          (sum: number, tx: any) => sum + (tx.amount || 0),
+        const monthlyRevenue = (transactionData as Transaction[]).reduce(
+          (sum: number, tx: Transaction) => sum + (tx.amount || 0),
           0
         );
 
         // --- 2. Calculate Chart Data ---
-        const chartData = calculateRevenueByMonth(transactionData);
+        const chartData = calculateRevenueByMonth(
+          transactionData as Transaction[]
+        );
         setMonthlyRevenueChartData(chartData);
 
         setDashboardStats({
@@ -294,7 +311,7 @@ export default function AdminDashboardPage() {
       value: dashboardStats.isLoading
         ? "..."
         : String(dashboardStats.totalEmployees),
-      icon: <User />,
+      icon: <UserIcon />, // Used UserIcon instead of Lucide's User to avoid collision with potential User interface
       color: "text-red-600 bg-red-100",
     },
     {
@@ -354,12 +371,10 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    // FIX: Added w-full and overflow-x-hidden to prevent layout pushing and horizontal scrolling/zooming
     <div className="w-full overflow-x-hidden min-h-screen bg-gray-50 p-4 sm:p-6 md:p-10">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
       <br />
       {/* 1. Core Statistics Grid */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6 mb-8">
         {coreStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
@@ -367,7 +382,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 2. Charts Section */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8">
         {/* Bar Chart: Monthly Revenue */}
         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-96">
@@ -450,7 +464,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 3. Operational Statistics Grid */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 mb-8">
         {operationalStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
@@ -458,7 +471,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 4. Quick Activity & Reports Section */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Recent Activity Feed */}
         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
