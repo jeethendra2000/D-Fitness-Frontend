@@ -16,7 +16,6 @@ import {
 import { API_BASE_URL } from "@/configs/constants";
 
 // --- Recharts Imports (assuming installed) ---
-// @ts-ignore
 import {
   BarChart,
   Bar,
@@ -219,7 +218,6 @@ export default function AdminDashboardPage() {
         );
 
         // --- 2. Calculate Chart Data ---
-        // FIX 3: Passed data is explicitly Transaction[]
         const chartData = calculateRevenueByMonth(
           transactionData as Transaction[]
         );
@@ -373,12 +371,10 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    // FIX: Added w-full and overflow-x-hidden to prevent layout pushing and horizontal scrolling/zooming
     <div className="w-full overflow-x-hidden min-h-screen bg-gray-50 p-4 sm:p-6 md:p-10">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
       <br />
       {/* 1. Core Statistics Grid */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6 mb-8">
         {coreStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
@@ -386,7 +382,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 2. Charts Section */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8">
         {/* Bar Chart: Monthly Revenue */}
         <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-96">
@@ -469,7 +464,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 3. Operational Statistics Grid */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 mb-8">
         {operationalStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
@@ -477,7 +471,6 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* 4. Quick Activity & Reports Section */}
-      {/* FIX: Reduced gap size on mobile for better space utilization */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Recent Activity Feed */}
         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border border-gray-100">

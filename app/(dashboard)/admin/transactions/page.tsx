@@ -4,6 +4,7 @@ import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 import TransactionForm from "@/components/adminComponents/forms/TransactionForm";
 import {
+  PaymentMode,
   Transaction,
   TransactionStatus,
   TransactionType,
@@ -194,6 +195,7 @@ export default function TransactionsPage() {
     amount: 1.0,
     type: TransactionType.SubscriptionPayment,
     status: TransactionStatus.Pending,
+    modeOfPayment: PaymentMode.Cash,
     subscriptionId: null,
     description: null,
     paymentGatewayId: null,
