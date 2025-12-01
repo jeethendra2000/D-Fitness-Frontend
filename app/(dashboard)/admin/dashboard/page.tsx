@@ -8,14 +8,15 @@ import {
   Dumbbell,
   LucideProps,
   Tag,
-  User,
+  User as UserIcon, // Renamed to avoid collision with interface below
   Star,
   List,
   BarChart3,
 } from "lucide-react";
 import { API_BASE_URL } from "@/configs/constants";
-// --- Recharts Imports ---
-// @ts-ignore: Assuming recharts will be installed or correctly resolved at build time
+
+// --- Recharts Imports (assuming installed) ---
+// @ts-ignore
 import {
   BarChart,
   Bar,
@@ -30,7 +31,20 @@ import {
   Cell,
 } from "recharts";
 
-// --- Placeholder for API Data Structure ---
+interface Transaction {
+  status: string;
+  amount: number;
+  createdOn: string;
+}
+
+interface Subscription {
+  status: string;
+}
+
+interface Enquiry {
+  status: string;
+}
+
 interface DashboardData {
   // Core Metrics
   totalCustomers: number;
@@ -95,12 +109,14 @@ const formatCurrency = (amount: number) => {
 };
 
 // --- Core Aggregation Logic ---
+// FIX 1: transactions array is now correctly typed
 const calculateRevenueByMonth = (
-  transactions: any[]
+  transactions: Transaction[]
 ): MonthlyRevenueDataPoint[] => {
   const revenueMap: Record<string, number> = {}; // Key: YYYY-MM
 
   transactions.forEach((tx) => {
+    // tx is now implicitly Transaction
     // Only aggregate completed transactions with an amount and valid date
     if (tx.status === "Completed" && tx.amount > 0 && tx.createdOn) {
       const date = new Date(tx.createdOn);
@@ -188,22 +204,25 @@ export default function AdminDashboardPage() {
         const totalTransactions = transactionData.length;
 
         const activeSubscriptions = subscriptionData.filter(
-          (sub: any) => sub.status === "Active"
+          (sub: Subscription) => sub.status === "Active"
         ).length;
 
         const totalFeedbacks = feedbackData.length;
 
         const pendingEnquiries = enquiryData.filter(
-          (enq: any) => enq.status === "New"
+          (enq: Enquiry) => enq.status === "New"
         ).length;
 
-        const monthlyRevenue = transactionData.reduce(
-          (sum: number, tx: any) => sum + (tx.amount || 0),
+        const monthlyRevenue = (transactionData as Transaction[]).reduce(
+          (sum: number, tx: Transaction) => sum + (tx.amount || 0),
           0
         );
 
         // --- 2. Calculate Chart Data ---
-        const chartData = calculateRevenueByMonth(transactionData);
+        // FIX 3: Passed data is explicitly Transaction[]
+        const chartData = calculateRevenueByMonth(
+          transactionData as Transaction[]
+        );
         setMonthlyRevenueChartData(chartData);
 
         setDashboardStats({
@@ -294,7 +313,7 @@ export default function AdminDashboardPage() {
       value: dashboardStats.isLoading
         ? "..."
         : String(dashboardStats.totalEmployees),
-      icon: <User />,
+      icon: <UserIcon />, // Used UserIcon instead of Lucide's User to avoid collision with potential User interface
       color: "text-red-600 bg-red-100",
     },
     {
