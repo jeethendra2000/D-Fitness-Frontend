@@ -65,10 +65,10 @@ export default function LoginClient() {
 
       const target =
         role === "admin"
-          ? "/dashboard/admin"
+          ? "/admin/dashboard"
           : role === "trainer"
-          ? "/dashboard/trainer"
-          : "/dashboard/customer";
+          ? "/trainer/dashboard"
+          : "/customer/dashboard";
 
       router.replace(target);
 
