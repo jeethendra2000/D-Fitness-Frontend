@@ -1,82 +1,256 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   TextField,
   Box,
-  FormControl,
-  InputLabel,
   MenuItem,
-  Select,
+  Avatar,
+  Button,
+  Typography,
+  Divider,
 } from "@mui/material";
-import { Employee, Status } from "@/configs/dataTypes";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { Employee, Status, Gender } from "@/configs/dataTypes";
 
 interface EmployeeFormProps {
   data: Employee;
   setData: React.Dispatch<React.SetStateAction<Employee>>;
+  readOnly?: boolean;
 }
 
-export default function EmployeeForm({ data, setData }: EmployeeFormProps) {
-  const statusOptions = Object.values(Status);
+export default function EmployeeForm({
+  data,
+  setData,
+  readOnly,
+}: EmployeeFormProps) {
+  // ✅ Prevent crash if data is undefined initially
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    data?.profileImageUrl || null
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview if external data changes
+  useEffect(() => {
+    if (data) {
+      setImagePreview(data.profileImageUrl || null);
+    }
+  }, [data]);
+
+  // ✅ Guard Clause
+  if (!data) {
+    return <Box sx={{ p: 2 }}>Loading form data...</Box>;
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
+      setData((prev) => ({ ...prev, profileImageFile: file }));
+    }
+  };
+
+  const handleChange =
+    (field: keyof Employee) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setData({ ...data, [field]: e.target.value });
+    };
+
+  const handleNumberChange =
+    (field: keyof Employee) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setData({ ...data, [field]: Number(e.target.value) });
+    };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-      <TextField
-        label="Firebase UID"
-        value={data.firebase_UID}
-        onChange={(e) => setData({ ...data, firebase_UID: e.target.value })}
-        fullWidth
-        required
-        inputProps={{ maxLength: 100 }}
-      />
+      {/* 📸 Image Upload */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 1,
+          mb: 2,
+        }}
+      >
+        <Avatar
+          src={imagePreview || ""}
+          sx={{ width: 100, height: 100, border: "2px solid #ddd" }}
+        />
+        {!readOnly && (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              ref={fileInputRef}
+              onChange={handleImageChange}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<CloudUploadIcon />}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload Photo
+            </Button>
+          </>
+        )}
+      </Box>
 
-      <TextField
-        label="Job Title"
-        value={data.jobTitle}
-        onChange={(e) => setData({ ...data, jobTitle: e.target.value })}
-        fullWidth
-        required
-        inputProps={{ maxLength: 100 }}
-      />
+      {/* 👤 Personal Information */}
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 1 }}>
+        Personal Details
+      </Typography>
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="First Name"
+          value={data.firstname || ""}
+          onChange={handleChange("firstname")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          label="Last Name"
+          value={data.lastname || ""}
+          onChange={handleChange("lastname")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+      </Box>
 
-      <TextField
-        label="Hire Date"
-        type="date"
-        value={data.hireDate ? data.hireDate.split("T")[0] : ""}
-        onChange={(e) => setData({ ...data, hireDate: e.target.value })}
-        InputLabelProps={{ shrink: true }}
-        fullWidth
-        required
-      />
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Email"
+          type="email"
+          value={data.email || ""}
+          onChange={handleChange("email")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          label="Phone"
+          value={data.phoneNumber || ""}
+          onChange={handleChange("phoneNumber")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+      </Box>
 
-      <TextField
-        label="Salary (₹)"
-        type="number"
-        value={data.salary}
-        onChange={(e) =>
-          setData({ ...data, salary: Number(e.target.value) || 0 })
-        }
-        fullWidth
-        required
-        inputProps={{ min: 0, max: 2147483647 }}
-      />
-
-      <FormControl fullWidth>
-        <InputLabel>Status</InputLabel>
-        <Select
-          value={data.status}
-          label="Status"
-          onChange={(e) =>
-            setData({ ...data, status: e.target.value as Status })
-          }
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Date of Birth"
+          type="date"
+          value={data.dateOfBirth ? data.dateOfBirth.split("T")[0] : ""}
+          onChange={handleChange("dateOfBirth")}
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          select
+          label="Gender"
+          value={data.gender || ""}
+          onChange={handleChange("gender")}
+          fullWidth
+          required
+          disabled={readOnly}
         >
-          {statusOptions.map((status) => (
-            <MenuItem key={status} value={status}>
-              {status}
+          {Object.values(Gender).map((g) => (
+            <MenuItem key={g} value={g}>
+              {g}
             </MenuItem>
           ))}
-        </Select>
-      </FormControl>
+        </TextField>
+      </Box>
+
+      <TextField
+        label="Address"
+        value={data.address || ""}
+        onChange={handleChange("address")}
+        multiline
+        rows={2}
+        fullWidth
+        disabled={readOnly}
+      />
+
+      <Divider />
+
+      {/* 💼 Professional Information */}
+      <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 1 }}>
+        Professional Details
+      </Typography>
+
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Job Title"
+          value={data.jobTitle || ""}
+          onChange={handleChange("jobTitle")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          label="Experience (Years)"
+          type="number"
+          value={data.yearsOfExperience ?? 0}
+          onChange={handleNumberChange("yearsOfExperience")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+      </Box>
+
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Salary (₹)"
+          type="number"
+          value={data.salary ?? 0}
+          onChange={handleNumberChange("salary")}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          label="Hire Date"
+          type="date"
+          value={data.hireDate ? data.hireDate.split("T")[0] : ""}
+          onChange={handleChange("hireDate")}
+          fullWidth
+          InputLabelProps={{ shrink: true }}
+          required
+          disabled={readOnly}
+        />
+      </Box>
+
+      <TextField
+        label="Bio"
+        value={data.bio || ""}
+        onChange={handleChange("bio")}
+        fullWidth
+        multiline
+        rows={3}
+        disabled={readOnly}
+      />
+      <TextField
+        label="Status"
+        select
+        value={data.status || Status.Active}
+        onChange={handleChange("status")}
+        fullWidth
+        disabled={readOnly}
+      >
+        {Object.values(Status).map((s) => (
+          <MenuItem key={s} value={s}>
+            {s}
+          </MenuItem>
+        ))}
+      </TextField>
     </Box>
   );
 }

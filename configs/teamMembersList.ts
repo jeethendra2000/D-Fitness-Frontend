@@ -1,9 +1,37 @@
 // Team members List
 export const TeamMembersList = [
-  { name: "Puneeth", role: "Owner", imageURL:"/img/team/team-1.jpg", socialLink:{facebook:'/', instagram:'/', whatsapp:'/', email:'/', youtube:'/'}},
-  { name: "Jeethendra", role: "Developer", imageURL:"/img/team/team-3.jpg", socialLink:{facebook:'/', instagram:'/', whatsapp:'/', email:'/', youtube:''}},
-  { name: "Jayanth Kumar", role: "Developer", imageURL:"/img/team/team-2.jpg", socialLink:{facebook:'/', instagram:'/', whatsapp:'', email:'/', youtube:''}},
-  { name: "Darshan", role: "Gym Trainer", imageURL:"/img/team/team-4.jpg", socialLink:{facebook:'/', instagram:'/', whatsapp:'', email:'', youtube:''}},
-  { name: "Likith Kumar", role: "Customer", imageURL:"/img/team/team-5.jpg", socialLink:{facebook:'/', instagram:'/', whatsapp:'', email:'', youtube:''}},
-  { name: "Vikas", role: "Customer", imageURL:"/img/team/team-6.jpg", socialLink:{facebook:'', instagram:'', whatsapp:'', email:'', youtube:''}},
+  {
+    name: "Puneeth",
+    role: "Gym Owner",
+    imageURL: "/img/team/team-1.jpg",
+    socialLink: {
+      facebook: "https://www.facebook.com/PROFILE_ID",
+      instagram: "https://www.instagram.com/PROFILE_ID",
+      whatsapp: "https://wa.me/919108720358",
+      email: "mailto:dfitnessgym2025@gmail.com",
+      youtube: "https://www.youtube.com/@CHANNEL_HANDLE",
+    },
+  },
+  {
+    name: "Jeethendra",
+    role: "Developer",
+    imageURL: "/img/team/team-2.jpg",
+    // imageURL: "/img/team/team-5.png",
+    socialLink: {
+      instagram: "https://www.instagram.com/PROFILE_ID",
+      whatsapp: "https://wa.me/917676373298",
+      email: "mailto:jeethendrajeethu8@gmail.com",
+      youtube: "https://youtube.com/@jeethendrasr",
+    },
+  },
+  {
+    name: "Jayanth Kumar",
+    role: "Developer",
+    imageURL: "/img/team/team-6.png",
+    socialLink: {
+      instagram: "https://www.instagram.com/PROFILE_ID",
+      whatsapp: "https://wa.me/919449460823",
+      email: "mailto:jksashtkar20@gmail.com",
+    },
+  },
 ];

@@ -4,18 +4,13 @@ import React, { useEffect, useState } from "react";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 import SubscriptionForm from "@/components/adminComponents/forms/SubscriptionForm";
-import { Subscription, Status } from "@/configs/dataTypes";
+import {
+  Subscription,
+  Status,
+  Customer,
+  Membership,
+} from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
-
-interface Customer {
-  id: string;
-  firebase_UID: string;
-}
-
-interface Membership {
-  id: string;
-  name: string;
-}
 
 export default function SubscriptionsPage() {
   const apiUrl = `${API_BASE_URL}/Subscriptions`;
@@ -25,7 +20,7 @@ export default function SubscriptionsPage() {
     {}
   );
 
-  // ✅ Fetch related data for display
+  // ✅ Fetch related data for display mapping
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,9 +40,11 @@ export default function SubscriptionsPage() {
           ? memJson
           : memJson.data || [];
 
+        // Create Map: ID -> Display Name
         const cMap: Record<string, string> = {};
         customers.forEach((c) => {
-          cMap[c.id] = c.firebase_UID;
+          // Prefer fullName, fallback to email
+          cMap[c.id] = c.fullName || c.email || "Unknown Customer";
         });
 
         const mMap: Record<string, string> = {};
@@ -90,9 +87,7 @@ export default function SubscriptionsPage() {
       renderCell: (params) => {
         if (!params.value) return "";
         const d = new Date(params.value);
-        return `${String(d.getDate()).padStart(2, "0")}-${String(
-          d.getMonth() + 1
-        ).padStart(2, "0")}-${d.getFullYear()}`;
+        return d.toLocaleDateString();
       },
     },
     {
@@ -103,9 +98,7 @@ export default function SubscriptionsPage() {
       renderCell: (params) => {
         if (!params.value) return "";
         const d = new Date(params.value);
-        return `${String(d.getDate()).padStart(2, "0")}-${String(
-          d.getMonth() + 1
-        ).padStart(2, "0")}-${d.getFullYear()}`;
+        return d.toLocaleDateString();
       },
     },
     {
@@ -127,10 +120,10 @@ export default function SubscriptionsPage() {
     id: "",
     customerId: "",
     membershipID: "",
-    startDate: new Date().toISOString(),
-    endDate: new Date(
-      new Date().setMonth(new Date().getMonth() + 1)
-    ).toISOString(),
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
+      .toISOString()
+      .split("T")[0],
     autoRenew: false,
     status: Status.Inactive,
   };
@@ -141,8 +134,8 @@ export default function SubscriptionsPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialSubscription}
-      renderForm={(data, setData) => (
-        <SubscriptionForm data={data} setData={setData} />
+      renderForm={(data, setData, readOnly) => (
+        <SubscriptionForm data={data} setData={setData} readOnly={readOnly} />
       )}
     />
   );

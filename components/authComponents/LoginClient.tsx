@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { signInWithEmailAndPassword } from "firebase/auth"; // Removed signInWithPopup
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth"; // Removed signInWithPopup
 import { auth } from "@/firebase"; // Removed googleProvider, microsoftProvider
 
 import MyPassField from "@/components/authComponents/passField";
@@ -65,10 +65,10 @@ export default function LoginClient() {
 
       const target =
         role === "admin"
-          ? "/dashboard/admin"
+          ? "/admin/dashboard"
           : role === "trainer"
-          ? "/dashboard/trainer"
-          : "/dashboard/customer";
+          ? "/trainer/dashboard"
+          : "/customer/dashboard";
 
       router.replace(target);
 
@@ -109,7 +109,7 @@ export default function LoginClient() {
             </a>
           </p>
           <p>
-            <Link href="/forgot-password" style={{ color: "#ff1313" }}>
+            <Link href="/auth/forgot-password" style={{ color: "#ff1313" }}>
               Forgot Password
             </Link>
           </p>

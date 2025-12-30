@@ -21,6 +21,7 @@ import Link from "next/link";
 import Image from "next/image";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import AccountMenu from "@/components/layoutComponents/AccountMenu";
 import { adminSidebarItemsList } from "@/configs/adminSidebarList";
 import { customerSidebarItemsList } from "@/configs/customerSidebarList";
 import { trainerSidebarItemsList } from "@/configs/trainerSidebarList";
@@ -197,9 +198,10 @@ export default function MiniDrawerDashboard({
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <IconButton color="inherit">
+            {/* <IconButton color="inherit">
               <AccountCircleIcon />
-            </IconButton>
+            </IconButton> */}
+            <AccountMenu />
           </Box>
         </Toolbar>
       </AppBar>

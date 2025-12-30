@@ -6,7 +6,8 @@ export default function WhyChooseUS() {
           <div className="row">
             <div className="col-lg-12">
               <div className="section-title">
-                <span>Why chose us?</span>
+                {/* Fixed spelling: chose -> choose */}
+                <span>Why choose us?</span>
                 <h2>PUSH YOUR LIMITS FORWARD</h2>
               </div>
             </div>
@@ -17,8 +18,9 @@ export default function WhyChooseUS() {
                 <span className="flaticon-034-stationary-bike"></span>
                 <h4>Modern equipment</h4>
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut dolore facilisis.
+                  Experience top-tier workouts with our state-of-the-art
+                  machines and free weights designed for safety, comfort, and
+                  maximum performance.
                 </p>
               </div>
             </div>
@@ -27,18 +29,21 @@ export default function WhyChooseUS() {
                 <span className="flaticon-033-juice"></span>
                 <h4>Healthy nutrition plan</h4>
                 <p>
-                  Quis ipsum suspendisse ultrices gravida. Risus commodo viverra
-                  maecenas accumsan lacus vel facilisis.
+                  Fuel your body right with customized meal plans and expert
+                  nutritional advice to accelerate your fitness results and
+                  boost energy.
                 </p>
               </div>
             </div>
             <div className="col-lg-3 col-sm-6">
               <div className="cs-item">
                 <span className="flaticon-002-dumbell"></span>
-                <h4>Proffesponal training plan</h4>
+                {/* Fixed typo: Proffesponal -> Professional */}
+                <h4>Professional training plan</h4>
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut dolore facilisis.
+                  Train smarter with certified coaches who create personalized
+                  programs tailored to your specific goals, fitness level, and
+                  schedule.
                 </p>
               </div>
             </div>
@@ -47,8 +52,9 @@ export default function WhyChooseUS() {
                 <span className="flaticon-014-heart-beat"></span>
                 <h4>Unique to your needs</h4>
                 <p>
-                  Quis ipsum suspendisse ultrices gravida. Risus commodo viverra
-                  maecenas accumsan lacus vel facilisis.
+                  We understand everyone is different. Our flexible approach
+                  ensures your fitness journey is adapted strictly to your
+                  lifestyle and capabilities.
                 </p>
               </div>
             </div>

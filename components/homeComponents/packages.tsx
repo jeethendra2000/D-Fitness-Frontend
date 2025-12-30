@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default async function Packages() {
   return (
     <>
@@ -12,64 +14,101 @@ export default async function Packages() {
             </div>
           </div>
           <div className="row justify-content-center">
-            <div className="col-lg-4 col-md-8">
+            {/* Plan 1: Monthly */}
+            <div className="col-lg-3 col-md-6">
               <div className="ps-item">
-                <h3>Monthly unlimited</h3>
+                <h3>Monthly</h3>
                 <div className="pi-price">
-                  <h2>₹ 1999 </h2>
-                  <span>SINGLE CLASS</span>
+                  <h2>₹ 1200</h2>
+                  <span>PER MONTH</span>
                 </div>
                 <ul>
-                  <li>Free riding</li>
-                  <li>Unlimited equipments</li>
-                  <li>Personal trainer</li>
-                  <li>Weight losing classes</li>
-                  <li>Month to mouth</li>
-                  <li>No time restriction</li>
+                  <li>General Training (G.T.)</li>
+                  <li>Morning & Evening Access</li>
+                  <li>Unlimited Equipment</li>
+                  <li
+                    style={{ textDecoration: "line-through", opacity: "0.6" }}
+                  >
+                    Personal Training
+                  </li>
+                  <li
+                    style={{ textDecoration: "line-through", opacity: "0.6" }}
+                  >
+                    Diet Guidance
+                  </li>
                 </ul>
-                <a href="#" className="primary-btn pricing-btn">
+                <Link href="/contact" className="primary-btn pricing-btn">
                   Enroll now
-                </a>
+                </Link>
               </div>
             </div>
-            <div className="col-lg-4 col-md-8">
+
+            {/* Plan 2: 3 Months */}
+            <div className="col-lg-3 col-md-6">
               <div className="ps-item">
-                <h3>12 Month unlimited</h3>
+                <h3>3 Months</h3>
                 <div className="pi-price">
-                  <h2>₹ 8999</h2>
-                  <span>SINGLE CLASS</span>
+                  <h2>₹ 3000</h2>
+                  <span>TOTAL</span>
                 </div>
                 <ul>
-                  <li>Free riding</li>
-                  <li>Unlimited equipments</li>
-                  <li>Personal trainer</li>
-                  <li>Weight losing classes</li>
-                  <li>Month to mouth</li>
-                  <li>No time restriction</li>
+                  <li>General Training (G.T.)</li>
+                  <li>
+                    <strong>5 Days</strong> Personal Training
+                  </li>
+                  <li>Diet & Nutrition Guidance</li>
+                  <li>Morning & Evening Access</li>
+                  <li>Unlimited Equipment</li>
                 </ul>
-                <a href="#" className="primary-btn pricing-btn">
+                <Link href="/contact" className="primary-btn pricing-btn">
                   Enroll now
-                </a>
+                </Link>
               </div>
             </div>
-            <div className="col-lg-4 col-md-8">
+
+            {/* Plan 3: 6 Months */}
+            <div className="col-lg-3 col-md-6">
               <div className="ps-item">
-                <h3>6 Month unlimited</h3>
+                <h3>6 Months</h3>
                 <div className="pi-price">
-                  <h2>₹ 5999</h2>
-                  <span>SINGLE CLASS</span>
+                  <h2>₹ 5500</h2>
+                  <span>TOTAL</span>
                 </div>
                 <ul>
-                  <li>Free riding</li>
-                  <li>Unlimited equipments</li>
-                  <li>Personal trainer</li>
-                  <li>Weight losing classes</li>
-                  <li>Month to mouth</li>
-                  <li>No time restriction</li>
+                  <li>General Training (G.T.)</li>
+                  <li>
+                    <strong>15 Days</strong> Personal Training
+                  </li>
+                  <li>Diet & Nutrition Guidance</li>
+                  <li>Morning & Evening Access</li>
+                  <li>Unlimited Equipment</li>
                 </ul>
-                <a href="#" className="primary-btn pricing-btn">
+                <Link href="/contact" className="primary-btn pricing-btn">
                   Enroll now
-                </a>
+                </Link>
+              </div>
+            </div>
+
+            {/* Plan 4: 1 Year */}
+            <div className="col-lg-3 col-md-6">
+              <div className="ps-item">
+                <h3>1 Year</h3>
+                <div className="pi-price">
+                  <h2>₹ 9999</h2>
+                  <span>TOTAL</span>
+                </div>
+                <ul>
+                  <li>General Training (G.T.)</li>
+                  <li>
+                    <strong>1 Month </strong> Personal Training
+                  </li>
+                  <li>Diet & Nutrition Guidance</li>
+                  <li>Morning & Evening Access</li>
+                  <li>Unlimited Equipment</li>
+                </ul>
+                <Link href="/contact" className="primary-btn pricing-btn">
+                  Enroll now
+                </Link>
               </div>
             </div>
           </div>

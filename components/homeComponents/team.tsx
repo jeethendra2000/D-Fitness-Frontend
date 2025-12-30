@@ -1,4 +1,5 @@
 import { TeamMembersList } from "@/configs/teamMembersList";
+import Link from "next/link";
 
 export default async function Team() {
   return (
@@ -12,9 +13,13 @@ export default async function Team() {
                   <span>Our Team</span>
                   <h2>TRAIN WITH EXPERTS</h2>
                 </div>
-                <a href="#" className="primary-btn btn-normal appoinment-btn">
+
+                <Link
+                  href="/contact"
+                  className="primary-btn btn-normal appoinment-btn"
+                >
                   appointment
-                </a>
+                </Link>
               </div>
             </div>
           </div>

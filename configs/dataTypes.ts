@@ -7,7 +7,11 @@ export type ApiResponse<T> = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
-
+export enum Gender {
+  Male = "Male",
+  Female = "Female",
+  Others = "Others",
+}
 export enum Status {
   Active = "Active",
   Inactive = "Inactive",
@@ -18,6 +22,7 @@ export enum MembershipType {
   Quarterly = "Quarterly",
   SemiAnnual = "SemiAnnual",
   Annual = "Annual",
+  Custom = "Custom",
 }
 
 export enum TransactionType {
@@ -47,11 +52,6 @@ export enum EnquiryStatus {
   Contacted = "Contacted",
   Resolved = "Resolved",
 }
-export enum FeedbackStatus {
-  New = "New",
-  Acknowledged = "Acknowledged",
-  Resolved = "Resolved",
-}
 
 export type Role = {
   id: string;
@@ -59,39 +59,76 @@ export type Role = {
 
 export type Employee = {
   id: string;
-  firebase_UID: string;
+  // Account Fields
+  firstname: string;
+  lastname: string;
+  fullName?: string;
+  email: string;
+  phoneNumber: string;
+  gender: Gender;
+  dateOfBirth: string; // YYYY-MM-DD
+  address?: string;
+  profileImageUrl?: string;
+  profileImageFile?: File | null; // ✅ Added for upload
+
+  // Employee Fields
   jobTitle: string;
   hireDate: string;
   salary: number;
+  yearsOfExperience: number;
+  bio?: string;
   status: Status;
 };
 
 export type Trainer = {
   id: string;
-  firebase_UID: string;
+  // Account Fields
+  firstname?: string;
+  lastname?: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  address?: string;
+  profileImageUrl?: string;
+  profileImageFile?: File | null;
+
+  // Employee Fields
   jobTitle: string;
   hireDate: string; // ISO date
   salary: number;
-  status: Status;
-  reportsToEmployeeID?: string | null;
-
-  // Trainer-specific fields
   specialization: string;
   yearsOfExperience: number;
   bio?: string | null;
+  status: Status;
+
+  // Trainer Fields
   certification?: string | null;
-  rating?: number | null;
   availableFrom?: string | null; // "HH:mm:ss"
   availableTo?: string | null; // "HH:mm:ss"
 };
 
 export type Customer = {
-  id: string; // From RetrieveCustomerDto (Guid)
-  firebase_UID: string; // Required, max length 100
-  height: number; // Range: 0–300
-  weight: number; // Range: 0–300
-  trainerRequired: boolean; // Default false
-  trainerId: string | null; // Nullable Guid
+  id: string;
+  // Account Fields
+  firstname?: string;
+  lastname?: string;
+  fullName?: string;
+  email?: string;
+  phoneNumber?: string;
+  gender?: string;
+  dateOfBirth: string;
+  address?: string;
+  trainerRequired: boolean;
+  trainerId: string | null;
+  profileImageUrl?: string;
+  profileImageFile?: File | null;
+
+  // Customer Fields
+  weight: number;
+  height: number;
+  joinedDate: string;
 };
 
 export type Membership = {
@@ -135,16 +172,6 @@ export type Enquiry = {
   phoneNumber: string;
   message: string;
   status: EnquiryStatus;
-  submittedAt: string;
-};
-
-export type Feedback = {
-  id: string;
-  firebase_UID: string | null;
-  subject: string | null;
-  message: string | null;
-  rating: number | null;
-  status: FeedbackStatus;
   submittedAt: string;
 };
 
