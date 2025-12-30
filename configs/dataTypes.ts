@@ -22,6 +22,7 @@ export enum MembershipType {
   Quarterly = "Quarterly",
   SemiAnnual = "SemiAnnual",
   Annual = "Annual",
+  Custom = "Custom",
 }
 
 export enum TransactionType {
@@ -49,11 +50,6 @@ export enum PaymentMode {
 export enum EnquiryStatus {
   New = "New",
   Contacted = "Contacted",
-  Resolved = "Resolved",
-}
-export enum FeedbackStatus {
-  New = "New",
-  Acknowledged = "Acknowledged",
   Resolved = "Resolved",
 }
 
@@ -176,16 +172,6 @@ export type Enquiry = {
   phoneNumber: string;
   message: string;
   status: EnquiryStatus;
-  submittedAt: string;
-};
-
-export type Feedback = {
-  id: string;
-  firebase_UID: string | null;
-  subject: string | null;
-  message: string | null;
-  rating: number | null;
-  status: FeedbackStatus;
   submittedAt: string;
 };
 
