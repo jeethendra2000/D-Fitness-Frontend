@@ -84,6 +84,7 @@ export type Trainer = {
   dateOfBirth?: string;
   address?: string;
   profileImageUrl?: string;
+  profileImageFile?: File | null;
   specialization: string;
   yearsOfExperience: number;
   bio?: string | null;
