@@ -14,18 +14,19 @@ import { API_BASE_URL } from "@/configs/constants";
 interface User {
   id: string;
   firebase_UID: string;
+  fullName?: string;
 }
 
-// Interface for Employee data required for mapping
 interface Employee {
   id: string;
   firebase_UID: string;
-  jobTitle: string; // Used for better display identification
+  jobTitle: string;
+  fullName?: string;
 }
 
 interface Subscription {
   id: string;
-  membershipID: string; // Needed to look up the membership name
+  membershipID: string;
 }
 
 interface Membership {
@@ -46,14 +47,14 @@ export default function TransactionsPage() {
       try {
         const [custRes, empRes, subRes, memRes] = await Promise.all([
           fetch(`${API_BASE_URL}/Customers`),
-          fetch(`${API_BASE_URL}/Employees`), // Fetch Employees
+          fetch(`${API_BASE_URL}/Employees`),
           fetch(`${API_BASE_URL}/Subscriptions`),
           fetch(`${API_BASE_URL}/Memberships`),
         ]);
 
         const [custJson, empJson, subJson, memJson] = await Promise.all([
           custRes.json(),
-          empRes.json(), // Process Employee JSON
+          empRes.json(),
           subRes.json(),
           memRes.json(),
         ]);
@@ -61,7 +62,7 @@ export default function TransactionsPage() {
         const customers: User[] = Array.isArray(custJson)
           ? custJson
           : custJson.data || [];
-        const employees: Employee[] = Array.isArray(empJson) // Define Employee type
+        const employees: Employee[] = Array.isArray(empJson)
           ? empJson
           : empJson.data || [];
         const subscriptions: Subscription[] = Array.isArray(subJson)
@@ -71,33 +72,34 @@ export default function TransactionsPage() {
           ? memJson
           : memJson.data || [];
 
-        // 1. Create Membership Map (ID -> Name)
+        // 1. Membership Map
         const memNameMap: Record<string, string> = {};
         memberships.forEach((m) => {
           if (m.id) memNameMap[m.id] = m.name;
         });
 
-        // 2. Create Unified User Map (ID -> Descriptive String)
+        // 2. User Map (Combined)
         const uMap: Record<string, string> = {};
-
-        // Add Customers
         customers.forEach((u) => {
-          if (u.id) uMap[u.id] = `Customer (${u.firebase_UID || "Unknown"})`;
+          if (u.id)
+            uMap[u.id] = u.fullName
+              ? `${u.fullName} (Customer)`
+              : `Customer (${u.firebase_UID})`;
         });
-
-        // Add Employees (Prioritize Employees if IDs overlap, which shouldn't happen)
         employees.forEach((e) => {
-          if (e.id) uMap[e.id] = `Employee (${e.jobTitle || "Staff"})`;
+          if (e.id)
+            uMap[e.id] = e.fullName
+              ? `${e.fullName} (Staff)`
+              : `Employee (${e.jobTitle})`;
         });
 
-        // 3. Create Subscription Display Map
+        // 3. Subscription Map
         const subMap: Record<string, string> = {};
         subscriptions.forEach((s) => {
           if (s.id) {
             const membershipName =
               memNameMap[s.membershipID] || "Unknown Membership";
-            // FIX: DO NOT TRUNCATE ID for full visibility
-            subMap[s.id] = `${membershipName} (${s.id})`;
+            subMap[s.id] = `${membershipName} (${s.id.substring(0, 8)}...)`;
           }
         });
 
@@ -114,29 +116,12 @@ export default function TransactionsPage() {
   const columns: GridColDef<Transaction>[] = [
     {
       field: "createdOn",
-      headerName: "Transaction Time", // Updated header
-      flex: 1, // Increased flex
-      minWidth: 180, // Increased minWidth
+      headerName: "Date & Time",
+      flex: 1.2,
+      minWidth: 180,
       renderCell: (params: GridRenderCellParams<Transaction, string>) => {
         if (!params.value) return "";
-        const d = new Date(params.value);
-
-        // Date part: DD-MM-YYYY
-        const day = String(d.getDate()).padStart(2, "0");
-        const month = String(d.getMonth() + 1).padStart(2, "0");
-        const year = d.getFullYear();
-        const datePart = `${day}-${month}-${year}`;
-
-        // Time part: HH:MM AM/PM (12-hour format)
-        let hours = d.getHours();
-        const minutes = String(d.getMinutes()).padStart(2, "0");
-        const ampm = hours >= 12 ? "PM" : "AM";
-        hours = hours % 12;
-        hours = hours ? hours : 12; // the hour '0' should be '12'
-        const hour12 = String(hours).padStart(2, "0");
-        const timePart = `${hour12}:${minutes} ${ampm}`;
-
-        return `${datePart} ${timePart}`;
+        return new Date(params.value).toLocaleString();
       },
     },
     {
@@ -144,61 +129,58 @@ export default function TransactionsPage() {
       headerName: "Payer",
       flex: 1,
       minWidth: 150,
-      // The map now contains descriptive strings like "Customer (...)" or "Employee (...)"
-      renderCell: (params: GridRenderCellParams<Transaction, string>) =>
-        userMap[params.value ?? ""] || "—",
+      renderCell: (params) => userMap[params.value ?? ""] || "—",
     },
     {
       field: "payeeId",
       headerName: "Payee",
       flex: 1,
       minWidth: 150,
-      // The map now contains descriptive strings like "Customer (...)" or "Employee (...)"
-      renderCell: (params: GridRenderCellParams<Transaction, string>) =>
-        userMap[params.value ?? ""] || "—",
+      renderCell: (params) => userMap[params.value ?? ""] || "—",
     },
     {
       field: "amount",
       headerName: "Amount",
-      flex: 0.5,
+      flex: 0.6,
       minWidth: 100,
-      renderCell: (params: GridRenderCellParams<Transaction, number>) =>
+      renderCell: (params) =>
         params.value != null ? `₹${params.value.toFixed(2)}` : "₹0.00",
     },
     {
       field: "type",
       headerName: "Type",
-      flex: 0.6,
+      flex: 0.8,
       minWidth: 120,
     },
     {
       field: "status",
       headerName: "Status",
-      flex: 0.6,
+      flex: 0.8,
       minWidth: 120,
     },
     {
       field: "subscriptionId",
-      headerName: "Subscription Details (ID)", // Updated header
-      flex: 2.2, // Increased flex significantly
-      minWidth: 350, // Increased width for the full UUID
-      renderCell: (params: GridRenderCellParams<Transaction, string | null>) =>
-        params.value ? subscriptionMap[params.value] || "N/A" : "N/A",
+      headerName: "Subscription",
+      flex: 1.2,
+      minWidth: 200,
+      renderCell: (params) =>
+        params.value ? subscriptionMap[params.value] || params.value : "—",
     },
   ];
 
   const initialTransaction: Transaction = {
-    id: "", // Generated by backend
+    id: "",
     createdOn: new Date().toISOString(),
     payerId: "",
     payeeId: "",
-    amount: 1.0,
+    amount: 0,
     type: TransactionType.SubscriptionPayment,
     status: TransactionStatus.Pending,
     modeOfPayment: PaymentMode.Cash,
     subscriptionId: null,
-    description: null,
-    paymentGatewayId: null,
+    offerId: null,
+    description: "",
+    paymentGatewayId: "",
   };
 
   return (
@@ -207,8 +189,9 @@ export default function TransactionsPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialTransaction}
-      renderForm={(data, setData) => (
-        <TransactionForm data={data} setData={setData} />
+      // ✅ Pass readOnly to the form
+      renderForm={(data, setData, readOnly) => (
+        <TransactionForm data={data} setData={setData} readOnly={readOnly} />
       )}
     />
   );
