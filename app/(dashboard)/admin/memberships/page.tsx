@@ -8,13 +8,13 @@ import { API_BASE_URL } from "@/configs/constants";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 
 export default function MembershipsPage() {
-  const apiUrl = `${API_BASE_URL}/Memberships`; // <-- your API endpoint
+  const apiUrl = `${API_BASE_URL}/Memberships`;
 
   const columns: GridColDef<Membership>[] = [
-    { field: "name", headerName: "Name", flex: 1, minWidth: 120 },
+    { field: "name", headerName: "Membership Name", flex: 1, minWidth: 120 },
     {
       field: "amount",
-      headerName: "Amount", // Simplified header name
+      headerName: "Amount",
       flex: 0.5,
       minWidth: 100,
       type: "number",
@@ -43,7 +43,7 @@ export default function MembershipsPage() {
     name: "",
     description: "",
     amount: 1,
-    duration: 1,
+    duration: 30, // Default to 30 days usually better than 1
     type: MembershipType.Monthly,
     status: Status.Active,
   };
@@ -54,8 +54,14 @@ export default function MembershipsPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialMembership}
-      renderForm={(data, setData) => (
-        <MembershipForm data={data} setData={setData} />
+      // Note: No payloadConverter needed here if your backend accepts JSON for Memberships (Standard)
+      // If your backend uses [FromForm] for Memberships too, you will need to add a converter similar to Trainers.
+      renderForm={(data, setData, readOnly) => (
+        <MembershipForm
+          data={data}
+          setData={setData}
+          readOnly={readOnly} // ✅ Pass readOnly here
+        />
       )}
     />
   );

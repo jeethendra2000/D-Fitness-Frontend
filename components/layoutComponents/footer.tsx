@@ -1,125 +1,99 @@
 import Image from "next/image";
 import Link from "next/link";
+
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer>
-      {/* <!-- Footer Section Begin --> */}
+      {/* */}
       <section className="footer-section">
         <div className="container">
           <div className="row">
-            <div className="col-lg-4">
+            {/* 1. About / Logo Section */}
+            <div className="col-lg-6">
               <div className="fs-about">
                 <div className="fa-logo">
-                  <Link href="#">
+                  <Link href="/">
                     <Image
                       src="/img/logo.png"
-                      width={200}
-                      height={200}
-                      alt="logo"
+                      width={180}
+                      height={60}
+                      alt="D-Fitness Gym Logo"
+                      style={{
+                        objectFit: "contain",
+                        width: "auto",
+                        height: "auto",
+                      }}
                     />
                   </Link>
                 </div>
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore dolore magna aliqua
-                  endisse ultrices gravida lorem.
+                  Transform your body and mind at D-Fitness Gym. Located in
+                  Hassan, Karnataka, we provide top-tier equipment and
+                  professional training to help you reach your goals.
                 </p>
                 <div className="fa-social">
-                  <Link href="#">
+                  <Link href="https://facebook.com" target="_blank">
                     <i className="fa fa-facebook"></i>
                   </Link>
-                  <Link href="#">
-                    <i className="fa fa-twitter"></i>
-                  </Link>
-                  <Link href="#">
-                    <i className="fa fa-youtube-play"></i>
-                  </Link>
-                  <Link href="#">
+                  <Link href="https://instagram.com" target="_blank">
                     <i className="fa fa-instagram"></i>
                   </Link>
-                  <Link href="#">
-                    <i className="fa  fa-whatsapp"></i>
+                  <Link href="https://youtube.com" target="_blank">
+                    <i className="fa fa-youtube-play"></i>
                   </Link>
-                  <Link href="#">
-                    <i className="fa  fa-envelope-o"></i>
+                  <Link href="https://wa.me/919108720358" target="_blank">
+                    <i className="fa fa-whatsapp"></i>
+                  </Link>
+                  <Link href="mailto:dfitnessgym2025@gmail.com">
+                    <i className="fa fa-envelope-o"></i>
                   </Link>
                 </div>
               </div>
             </div>
-            <div className="col-lg-2 col-md-3 col-sm-6">
+
+            {/* 2. Useful Links */}
+            <div className="col-lg-2 offset-lg-2 col-md-3 col-sm-6">
               <div className="fs-widget">
                 <h4>Useful links</h4>
                 <ul>
                   <li>
-                    <Link href="/about">About</Link>
-                  </li>
-                  <li>
-                    <Link href="/services">Services</Link>
-                  </li>
-                  <li>
-                    <Link href="/ourteam">Our Team</Link>
+                    <Link href="/">Home</Link>
                   </li>
                   <li>
                     <Link href="/gallery">Gallery</Link>
                   </li>
+                  <li>
+                    <Link href="/team">Our Team</Link>
+                  </li>
                 </ul>
               </div>
             </div>
+
+            {/* 3. Support Links */}
             <div className="col-lg-2 col-md-3 col-sm-6">
               <div className="fs-widget">
                 <h4>Support</h4>
                 <ul>
                   <li>
-                    <Link href="/login">Login</Link>
+                    <Link href="/auth/login">Login</Link>
                   </li>
                   <li>
-                    <Link href="/myaccount">My account</Link>
-                  </li>
-                  <li>
-                    <Link href="/subscribe">Subscribe</Link>
-                  </li>
-                  <li>
-                    <Link href="/contact">Contact</Link>
+                    <Link href="/contact">Contact Us</Link>
                   </li>
                 </ul>
               </div>
             </div>
-            <div className="col-lg-4 col-md-6">
-              <div className="fs-widget">
-                <h4>Tips & Guides</h4>
-                <div className="fw-recent">
-                  <h6>
-                    <Link href="#">
-                      Physical fitness may help prevent depression, anxiety
-                    </Link>
-                  </h6>
-                  <ul>
-                    <li>3 min read</li>
-                    <li>20 Comment</li>
-                  </ul>
-                </div>
-                <div className="fw-recent">
-                  <h6>
-                    <Link href="#">
-                      Fitness: The best exercise to lose belly fat and tone
-                      up...
-                    </Link>
-                  </h6>
-                  <ul>
-                    <li>3 min read</li>
-                    <li>20 Comment</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
+          {/* 5. Copyright */}
           <div className="row">
             <div className="col-lg-12 text-center">
               <div className="copyright-text">
                 <p>
                   {/* <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --> */}
-                  Copyright &copy;
-                  {new Date().getFullYear()} All rights reserved |{" "}
+                  Copyright &copy; {currentYear} <strong>D-Fitness Gym</strong>.
+                  All rights reserved.
                   {/* Made with{" "} <i className="fa fa-heart" aria-hidden="true"></i> |  */}{" "}
                   <Link href="https://colorlib.com" target="_blank">
                     Colorlib
@@ -131,7 +105,7 @@ export default function Footer() {
           </div>
         </div>
       </section>
-      {/* <!-- Footer Section End --> */}
+      {/* */}
     </footer>
   );
 }

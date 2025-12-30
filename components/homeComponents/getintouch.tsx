@@ -9,7 +9,8 @@ export default async function GetInTouch() {
                 <i className="fa fa-map-marker"></i>
                 <p>
                   Dream fitness gym
-                  <br />b, Arsikere road, Katihalli, Hassan,
+                  <br />
+                  b, Arsikere road, Katihalli, Hassan,
                   <br /> Karnataka 573201
                 </p>
               </div>
@@ -18,15 +19,15 @@ export default async function GetInTouch() {
               <div className="gt-text">
                 <i className="fa fa-mobile"></i>
                 <ul>
-                  <li> +91 99016 47430</li>
-                  <li> +91 99016 47430</li>
+                  <li> +91 9108720358</li>
+                  <li> +91 8618964880</li>
                 </ul>
               </div>
             </div>
             <div className="col-md-4">
               <div className="gt-text email">
                 <i className="fa fa-envelope"></i>
-                <p>dfitness@gmail.com</p>
+                <p>dfitnessgym2025@gmail.com</p>
               </div>
             </div>
           </div>

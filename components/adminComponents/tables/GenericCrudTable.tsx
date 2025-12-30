@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -10,8 +10,6 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  useTheme,
-  useMediaQuery,
   Snackbar,
   Alert,
 } from "@mui/material";
@@ -31,6 +29,7 @@ interface GenericCrudTableProps<T extends { id: string }> {
     setData: React.Dispatch<React.SetStateAction<T>>,
     readOnly?: boolean
   ) => React.ReactNode;
+  payloadConverter?: (data: T, isUpdate: boolean) => FormData | T;
 }
 
 export default function GenericCrudTable<T extends { id: string }>({
@@ -39,6 +38,7 @@ export default function GenericCrudTable<T extends { id: string }>({
   columns,
   initialFormData,
   renderForm,
+  payloadConverter,
 }: GenericCrudTableProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
@@ -47,21 +47,16 @@ export default function GenericCrudTable<T extends { id: string }>({
   const [viewData, setViewData] = useState<T | null>(null);
   const [formData, setFormData] = useState<T>(initialFormData);
 
-  // ✅ Snackbar state
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
     severity: "success" | "error" | "info" | "warning";
   }>({ open: false, message: "", severity: "info" });
 
-  // ✅ Delete confirmation dialog
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     id?: string;
   }>({ open: false });
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const showSnackbar = (
     message: string,
@@ -70,83 +65,98 @@ export default function GenericCrudTable<T extends { id: string }>({
     setSnackbar({ open: true, message, severity });
   };
 
-  /** ✅ Fetch Data */
-  const fetchData = async () => {
+  // ✅ FIX 1: Wrap fetchData in useCallback to stabilize the function reference
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(apiUrl);
+
+      if (res.status === 204) {
+        setRows([]);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.statusText}`);
+      }
+
       const json = await res.json();
-      setRows(json.data ?? json);
+      setRows(Array.isArray(json) ? json : json.data || []);
     } catch (err) {
       console.error("Fetch error:", err);
       showSnackbar("Failed to fetch data", "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl]); // Added dependency
 
+  // ✅ FIX 1 (Cont): Added fetchData to dependency array
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  /** ✅ Add Record */
   const handleAdd = () => {
     setEditData(null);
     setFormData(initialFormData);
     setOpen(true);
   };
 
-  /** ✅ Edit Record */
   const handleEdit = (row: T) => {
     setEditData(row);
     setFormData(row);
     setOpen(true);
   };
 
-  /** ✅ View (Read Only) */
   const handleView = (row: T) => {
     setViewData(row);
     setOpen(true);
   };
 
-  /** ✅ Delete Record */
   const confirmDelete = (id: string) => {
     setDeleteDialog({ open: true, id });
   };
 
   const handleDelete = async () => {
     if (!deleteDialog.id) return;
-
     try {
       const res = await fetch(`${apiUrl}/${deleteDialog.id}`, {
         method: "DELETE",
       });
-
       if (!res.ok) {
         const errorData = await res.text();
         showSnackbar(`Delete failed: ${errorData}`, "error");
         return;
       }
-
       setRows((prev) => prev.filter((r) => r.id !== deleteDialog.id));
       showSnackbar("Deleted successfully", "success");
-    } catch (e) {
+    } catch {
+      // ✅ FIX 2: Removed unused variable (e)
       showSnackbar("Delete error", "error");
     } finally {
       setDeleteDialog({ open: false });
     }
   };
 
-  /** ✅ Create or Update API */
   const handleSubmit = async () => {
     try {
-      const method = editData ? "PATCH" : "POST";
-      const url = editData ? `${apiUrl}/${editData.id}` : apiUrl;
+      const isUpdate = !!editData;
+      const method = isUpdate ? "PATCH" : "POST";
+      const url = isUpdate ? `${apiUrl}/${editData.id}` : apiUrl;
+
+      let body: string | FormData;
+      let headers: HeadersInit = {};
+
+      if (payloadConverter) {
+        body = payloadConverter(formData, isUpdate) as FormData;
+      } else {
+        headers = { "Content-Type": "application/json" };
+        body = JSON.stringify(formData);
+      }
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers,
+        body,
       });
 
       if (!res.ok) {
@@ -159,7 +169,7 @@ export default function GenericCrudTable<T extends { id: string }>({
       setOpen(false);
       setViewData(null);
       showSnackbar(
-        editData ? "Updated successfully" : "Created successfully",
+        isUpdate ? "Updated successfully" : "Created successfully",
         "success"
       );
     } catch (err) {
@@ -179,11 +189,9 @@ export default function GenericCrudTable<T extends { id: string }>({
         <IconButton color="primary" onClick={() => handleView(params.row)}>
           <VisibilityIcon />
         </IconButton>
-
         <IconButton color="primary" onClick={() => handleEdit(params.row)}>
           <EditIcon />
         </IconButton>
-
         <IconButton color="error" onClick={() => confirmDelete(params.row.id)}>
           <DeleteIcon />
         </IconButton>
@@ -195,15 +203,12 @@ export default function GenericCrudTable<T extends { id: string }>({
 
   return (
     <Box sx={{ p: 2, backgroundColor: "#fff", borderRadius: 2 }}>
-      {/* Header */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h5">{title}</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
           Add
         </Button>
       </Box>
-
-      {/* Data Grid */}
       <DataGrid
         rows={rows}
         columns={[...columns, actionColumn]}
@@ -212,9 +217,8 @@ export default function GenericCrudTable<T extends { id: string }>({
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[5, 10, 20]}
+        localeText={{ noRowsLabel: "No records found" }}
       />
-
-      {/* Modal (Add/Edit/View) */}
       <Dialog
         open={open}
         onClose={() => {
@@ -222,6 +226,7 @@ export default function GenericCrudTable<T extends { id: string }>({
           setViewData(null);
         }}
         fullWidth
+        maxWidth="md"
       >
         <DialogTitle>
           {isReadOnly
@@ -230,15 +235,13 @@ export default function GenericCrudTable<T extends { id: string }>({
             ? `Edit ${title}`
             : `Add ${title}`}
         </DialogTitle>
-
-        <DialogContent>
+        <DialogContent dividers>
           {renderForm(
             isReadOnly ? (viewData as T) : formData,
             setFormData,
             isReadOnly
           )}
         </DialogContent>
-
         <DialogActions>
           <Button
             onClick={() => {
@@ -248,7 +251,6 @@ export default function GenericCrudTable<T extends { id: string }>({
           >
             Close
           </Button>
-
           {!isReadOnly && (
             <Button variant="contained" onClick={handleSubmit}>
               {editData ? "Update" : "Create"}
@@ -256,8 +258,6 @@ export default function GenericCrudTable<T extends { id: string }>({
           )}
         </DialogActions>
       </Dialog>
-
-      {/* ✅ Delete Confirmation Dialog */}
       <Dialog
         open={deleteDialog.open}
         onClose={() => setDeleteDialog({ open: false })}
@@ -275,8 +275,6 @@ export default function GenericCrudTable<T extends { id: string }>({
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* ✅ Snackbar for clean alerts */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
