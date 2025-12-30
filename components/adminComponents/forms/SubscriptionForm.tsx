@@ -75,7 +75,6 @@ export default function SubscriptionForm({
 
   // 2. ✅ Auto-Calculate End Date logic
   useEffect(() => {
-    // Only calculate if not in read-only mode and we have necessary data
     if (readOnly || !data.startDate || !data.membershipID) return;
 
     const selectedMem = memberships.find((m) => m.id === data.membershipID);
@@ -87,10 +86,8 @@ export default function SubscriptionForm({
       const end = new Date(start);
       end.setDate(start.getDate() + selectedMem.duration);
 
-      // Format to YYYY-MM-DD
       const endDateString = end.toISOString().split("T")[0];
 
-      // Only update if the value is different to avoid infinite loops
       if (data.endDate !== endDateString) {
         setData((prev) => ({ ...prev, endDate: endDateString }));
       }
@@ -103,6 +100,33 @@ export default function SubscriptionForm({
     setData,
     data.endDate,
   ]);
+
+  // 3. ✅ Auto-Update Status based on Date Range
+  useEffect(() => {
+    // Skip if readOnly or dates are missing
+    if (readOnly || !data.startDate || !data.endDate) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to midnight
+
+    const start = new Date(data.startDate);
+    start.setHours(0, 0, 0, 0); // Normalize start date
+
+    const end = new Date(data.endDate);
+    end.setHours(0, 0, 0, 0); // Normalize end date
+
+    let newStatus = Status.Inactive;
+
+    // Logic: If today is within the range [Start, End], status is Active
+    if (today >= start && today <= end) {
+      newStatus = Status.Active;
+    }
+
+    // Only update state if the status is different (prevents infinite loops)
+    if (data.status !== newStatus) {
+      setData((prev) => ({ ...prev, status: newStatus }));
+    }
+  }, [data.startDate, data.endDate, readOnly, setData, data.status]);
 
   // Safe finds for Autocomplete
   const selectedCustomer =
@@ -206,15 +230,16 @@ export default function SubscriptionForm({
         />
       </Box>
 
-      {/* Status */}
+      {/* Status - Note: This field is now auto-calculated but still manually overridable if needed */}
       <TextField
         select
-        label="Status"
+        label="Status (Auto-calculated)"
         value={data.status || Status.Inactive}
         onChange={(e) => setData({ ...data, status: e.target.value as Status })}
         fullWidth
         required
         disabled={readOnly}
+        helperText="Status updates automatically based on date range, but you can override it."
       >
         {statusOptions.map((option) => (
           <MenuItem key={option} value={option}>
