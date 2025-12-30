@@ -12,16 +12,43 @@ export default function TrainersPage() {
 
   const columns: GridColDef<Trainer>[] = [
     { field: "fullName", headerName: "Full Name", flex: 1, minWidth: 150 },
-    { field: "email", headerName: "Email", flex: 1, minWidth: 150 },
     { field: "phoneNumber", headerName: "Phone", flex: 0.8 },
     { field: "specialization", headerName: "Specialization", flex: 0.7 },
-    { field: "jobTitle", headerName: "Title", flex: 0.6 },
     {
-      field: "salary",
-      headerName: "Salary",
-      flex: 0.4,
+      field: "yearsOfExperience",
+      headerName: "Experience (yrs)",
+      flex: 0.5,
+      minWidth: 120,
+    },
+    {
+      field: "availableFrom",
+      headerName: "Available From",
+      flex: 0.45,
       minWidth: 100,
-      valueFormatter: (value) => (value ? `₹${value}` : "₹0"),
+      renderCell: (params: GridRenderCellParams<Trainer, string>) => {
+        if (!params.value) return "";
+        const [hourStr, minuteStr] = params.value.split(":");
+        let hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12; // convert 0 → 12
+        return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+      },
+    },
+    {
+      field: "availableTo",
+      headerName: "Available To",
+      flex: 0.45,
+      minWidth: 100,
+      renderCell: (params: GridRenderCellParams<Trainer, string>) => {
+        if (!params.value) return "";
+        const [hourStr, minuteStr] = params.value.split(":");
+        let hour = parseInt(hourStr);
+        const minute = parseInt(minuteStr);
+        const ampm = hour >= 12 ? "PM" : "AM";
+        hour = hour % 12 || 12;
+        return `${hour}:${minute.toString().padStart(2, "0")} ${ampm}`;
+      },
     },
     { field: "status", headerName: "Status", flex: 0.4 },
   ];

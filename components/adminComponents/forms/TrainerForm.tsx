@@ -90,7 +90,6 @@ export default function TrainerForm({
           </>
         )}
       </Box>
-
       {/* 👤 Personal Information */}
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 1 }}>
         Personal Details
@@ -113,7 +112,6 @@ export default function TrainerForm({
           disabled={readOnly}
         />
       </Box>
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Email"
@@ -133,7 +131,6 @@ export default function TrainerForm({
           disabled={readOnly}
         />
       </Box>
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Date of Birth"
@@ -161,7 +158,6 @@ export default function TrainerForm({
           ))}
         </TextField>
       </Box>
-
       <TextField
         label="Address"
         value={data.address || ""}
@@ -171,14 +167,11 @@ export default function TrainerForm({
         fullWidth
         disabled={readOnly}
       />
-
       <Divider />
-
       {/* 💼 Professional Information */}
       <Typography variant="subtitle1" sx={{ fontWeight: "bold", mt: 1 }}>
         Professional Details
       </Typography>
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Job Title"
@@ -189,21 +182,15 @@ export default function TrainerForm({
           disabled={readOnly}
         />
         <TextField
-          label="Status"
-          select
-          value={data.status || Status.Active}
-          onChange={handleChange("status")}
+          label="Experience (Years)"
+          type="number"
+          value={data.yearsOfExperience}
+          onChange={handleNumberChange("yearsOfExperience")}
           fullWidth
+          required
           disabled={readOnly}
-        >
-          {Object.values(Status).map((s) => (
-            <MenuItem key={s} value={s}>
-              {s}
-            </MenuItem>
-          ))}
-        </TextField>
+        />
       </Box>
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Salary (₹)"
@@ -225,7 +212,6 @@ export default function TrainerForm({
           disabled={readOnly}
         />
       </Box>
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Specialization"
@@ -236,24 +222,13 @@ export default function TrainerForm({
           disabled={readOnly}
         />
         <TextField
-          label="Experience (Years)"
-          type="number"
-          value={data.yearsOfExperience}
-          onChange={handleNumberChange("yearsOfExperience")}
+          label="Certification"
+          value={data.certification || ""}
+          onChange={handleChange("certification")}
           fullWidth
-          required
           disabled={readOnly}
         />
       </Box>
-
-      <TextField
-        label="Certification"
-        value={data.certification || ""}
-        onChange={handleChange("certification")}
-        fullWidth
-        disabled={readOnly}
-      />
-
       <Box sx={{ display: "flex", gap: 2 }}>
         <TextField
           label="Available From"
@@ -274,7 +249,6 @@ export default function TrainerForm({
           disabled={readOnly}
         />
       </Box>
-
       <TextField
         label="Bio / Description"
         value={data.bio || ""}
@@ -284,6 +258,20 @@ export default function TrainerForm({
         rows={3}
         disabled={readOnly}
       />
+      <TextField
+        label="Status"
+        select
+        value={data.status || Status.Active}
+        onChange={handleChange("status")}
+        fullWidth
+        disabled={readOnly}
+      >
+        {Object.values(Status).map((s) => (
+          <MenuItem key={s} value={s}>
+            {s}
+          </MenuItem>
+        ))}
+      </TextField>
     </Box>
   );
 }

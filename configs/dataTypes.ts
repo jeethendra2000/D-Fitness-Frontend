@@ -63,39 +63,59 @@ export type Role = {
 
 export type Employee = {
   id: string;
-  firebase_UID: string;
+  // Account Fields
+  firstname: string;
+  lastname: string;
+  fullName?: string;
+  email: string;
+  phoneNumber: string;
+  gender: Gender;
+  dateOfBirth: string; // YYYY-MM-DD
+  address?: string;
+  profileImageUrl?: string;
+  profileImageFile?: File | null; // ✅ Added for upload
+
+  // Employee Fields
   jobTitle: string;
   hireDate: string;
   salary: number;
+  yearsOfExperience: number;
+  bio?: string;
   status: Status;
 };
 
 export type Trainer = {
   id: string;
+  // Account Fields
   firstname?: string;
   lastname?: string;
   fullName?: string;
   email?: string;
   phoneNumber?: string;
-  jobTitle: string;
-  hireDate: string; // ISO date
-  salary: number;
   gender?: string;
   dateOfBirth?: string;
   address?: string;
   profileImageUrl?: string;
   profileImageFile?: File | null;
+
+  // Employee Fields
+  jobTitle: string;
+  hireDate: string; // ISO date
+  salary: number;
   specialization: string;
   yearsOfExperience: number;
   bio?: string | null;
+  status: Status;
+
+  // Trainer Fields
   certification?: string | null;
   availableFrom?: string | null; // "HH:mm:ss"
   availableTo?: string | null; // "HH:mm:ss"
-  status: Status;
 };
 
 export type Customer = {
   id: string;
+  // Account Fields
   firstname?: string;
   lastname?: string;
   fullName?: string;
@@ -104,13 +124,15 @@ export type Customer = {
   gender?: string;
   dateOfBirth: string;
   address?: string;
-  height: number;
-  weight: number;
   trainerRequired: boolean;
   trainerId: string | null;
-  joinedDate: string;
   profileImageUrl?: string;
   profileImageFile?: File | null;
+
+  // Customer Fields
+  weight: number;
+  height: number;
+  joinedDate: string;
 };
 
 export type Membership = {
