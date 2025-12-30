@@ -29,7 +29,6 @@ interface GenericCrudTableProps<T extends { id: string }> {
     setData: React.Dispatch<React.SetStateAction<T>>,
     readOnly?: boolean
   ) => React.ReactNode;
-  // Optional: Function to convert data to FormData (for file uploads)
   payloadConverter?: (data: T, isUpdate: boolean) => FormData | T;
 }
 
@@ -70,11 +69,23 @@ export default function GenericCrudTable<T extends { id: string }>({
     setLoading(true);
     try {
       const res = await fetch(apiUrl);
+
+      // ✅ FIX: Handle 204 No Content (Empty DB)
+      if (res.status === 204) {
+        setRows([]);
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.statusText}`);
+      }
+
       const json = await res.json();
-      // Handle different API response structures (list vs { data: list })
       setRows(Array.isArray(json) ? json : json.data || []);
     } catch (err) {
       console.error("Fetch error:", err);
+      // Don't show error snackbar for empty 204s if logic slips through,
+      // but usually 204 is handled above.
       showSnackbar("Failed to fetch data", "error");
     } finally {
       setLoading(false);
@@ -129,19 +140,15 @@ export default function GenericCrudTable<T extends { id: string }>({
   const handleSubmit = async () => {
     try {
       const isUpdate = !!editData;
-      const method = isUpdate ? "PATCH" : "POST"; // Use PUT for full updates or map based on backend
+      const method = isUpdate ? "PATCH" : "POST";
       const url = isUpdate ? `${apiUrl}/${editData.id}` : apiUrl;
 
       let body: string | FormData;
       let headers: HeadersInit = {};
 
       if (payloadConverter) {
-        // Convert to FormData (multipart/form-data)
-        // Note: Do NOT set 'Content-Type': 'multipart/form-data' manually here.
-        // The browser sets it automatically with the boundary when body is FormData.
         body = payloadConverter(formData, isUpdate) as FormData;
       } else {
-        // Standard JSON
         headers = { "Content-Type": "application/json" };
         body = JSON.stringify(formData);
       }
@@ -210,6 +217,8 @@ export default function GenericCrudTable<T extends { id: string }>({
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[5, 10, 20]}
+        // Optional: Custom message when no rows
+        localeText={{ noRowsLabel: "No records found" }}
       />
       <Dialog
         open={open}

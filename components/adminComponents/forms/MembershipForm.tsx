@@ -1,105 +1,94 @@
 "use client";
 
 import React from "react";
-import {
-  TextField,
-  Box,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
-import type { Membership } from "@/configs/dataTypes";
-import { MembershipType, Status } from "@/configs/dataTypes";
+import { TextField, Box, MenuItem } from "@mui/material";
+import { Membership, MembershipType, Status } from "@/configs/dataTypes";
 
 interface MembershipFormProps {
   data: Membership;
   setData: React.Dispatch<React.SetStateAction<Membership>>;
+  readOnly?: boolean;
 }
 
-export default function MembershipForm({ data, setData }: MembershipFormProps) {
-  const membershipTypes = Object.values(MembershipType);
-  const statusOptions = Object.values(Status);
-
-  const handleSelectChange = <K extends keyof Membership>(
-    e: SelectChangeEvent<Membership[K]>,
-    field: K
-  ) => {
-    setData({ ...data, [field]: e.target.value as Membership[K] });
-  };
+export default function MembershipForm({
+  data,
+  setData,
+  readOnly,
+}: MembershipFormProps) {
+  // Guard Clause to prevent crash on load
+  if (!data) return <Box>Loading...</Box>;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
       <TextField
         label="Membership Name"
-        value={data.name}
+        value={data.name || ""}
         onChange={(e) => setData({ ...data, name: e.target.value })}
         fullWidth
         required
-        inputProps={{ maxLength: 150, minLength: 1 }}
+        disabled={readOnly}
       />
-
+      <TextField
+        select
+        label="Type"
+        value={data.type || MembershipType.Monthly}
+        onChange={(e) =>
+          setData({ ...data, type: e.target.value as MembershipType })
+        }
+        fullWidth
+        disabled={readOnly}
+      >
+        {Object.values(MembershipType).map((t) => (
+          <MenuItem key={t} value={t}>
+            {t}
+          </MenuItem>
+        ))}
+      </TextField>
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Amount (₹)"
+          type="number"
+          value={data.amount ?? 0}
+          onChange={(e) => setData({ ...data, amount: Number(e.target.value) })}
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          label="Duration (Days)"
+          type="number"
+          value={data.duration ?? 0}
+          onChange={(e) =>
+            setData({ ...data, duration: Number(e.target.value) })
+          }
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+      </Box>
       <TextField
         label="Description"
-        value={data.description}
+        value={data.description || ""}
         onChange={(e) => setData({ ...data, description: e.target.value })}
         fullWidth
-        required
         multiline
         rows={3}
-        inputProps={{ maxLength: 500, minLength: 1 }}
+        disabled={readOnly}
       />
-
       <TextField
-        label="Amount (₹)"
-        type="number"
-        value={data.amount}
-        onChange={(e) => setData({ ...data, amount: Number(e.target.value) })}
+        select
+        label="Status"
+        value={data.status || Status.Active}
+        onChange={(e) => setData({ ...data, status: e.target.value as Status })}
         fullWidth
-        required
-        inputProps={{ min: 1, max: 100000 }}
-      />
-
-      <TextField
-        label="Duration (days)"
-        type="number"
-        value={data.duration}
-        onChange={(e) => setData({ ...data, duration: Number(e.target.value) })}
-        fullWidth
-        required
-        inputProps={{ min: 1, max: 10000 }}
-      />
-
-      <FormControl fullWidth required>
-        <InputLabel>Membership Type</InputLabel>
-        <Select
-          value={data.type}
-          label="Membership Type"
-          onChange={(e) => handleSelectChange(e, "type")}
-        >
-          {membershipTypes.map((type) => (
-            <MenuItem key={type} value={type}>
-              {type}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth required>
-        <InputLabel>Status</InputLabel>
-        <Select
-          value={data.status}
-          label="Status"
-          onChange={(e) => handleSelectChange(e, "status")}
-        >
-          {statusOptions.map((status) => (
-            <MenuItem key={status} value={status}>
-              {status}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+        disabled={readOnly}
+      >
+        {Object.values(Status).map((s) => (
+          <MenuItem key={s} value={s}>
+            {s}
+          </MenuItem>
+        ))}
+      </TextField>
     </Box>
   );
 }
