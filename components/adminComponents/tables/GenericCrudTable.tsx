@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -65,12 +65,12 @@ export default function GenericCrudTable<T extends { id: string }>({
     setSnackbar({ open: true, message, severity });
   };
 
-  const fetchData = async () => {
+  // ✅ FIX 1: Wrap fetchData in useCallback to stabilize the function reference
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(apiUrl);
 
-      // ✅ FIX: Handle 204 No Content (Empty DB)
       if (res.status === 204) {
         setRows([]);
         return;
@@ -84,17 +84,16 @@ export default function GenericCrudTable<T extends { id: string }>({
       setRows(Array.isArray(json) ? json : json.data || []);
     } catch (err) {
       console.error("Fetch error:", err);
-      // Don't show error snackbar for empty 204s if logic slips through,
-      // but usually 204 is handled above.
       showSnackbar("Failed to fetch data", "error");
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiUrl]); // Added dependency
 
+  // ✅ FIX 1 (Cont): Added fetchData to dependency array
   useEffect(() => {
     fetchData();
-  }, [apiUrl]);
+  }, [fetchData]);
 
   const handleAdd = () => {
     setEditData(null);
@@ -130,7 +129,8 @@ export default function GenericCrudTable<T extends { id: string }>({
       }
       setRows((prev) => prev.filter((r) => r.id !== deleteDialog.id));
       showSnackbar("Deleted successfully", "success");
-    } catch (e) {
+    } catch {
+      // ✅ FIX 2: Removed unused variable (e)
       showSnackbar("Delete error", "error");
     } finally {
       setDeleteDialog({ open: false });
@@ -217,7 +217,6 @@ export default function GenericCrudTable<T extends { id: string }>({
         autoHeight
         disableRowSelectionOnClick
         pageSizeOptions={[5, 10, 20]}
-        // Optional: Custom message when no rows
         localeText={{ noRowsLabel: "No records found" }}
       />
       <Dialog
