@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { navItemsList } from "@/configs/navItemsList";
 import NavItem from "./navItem";
@@ -10,9 +12,11 @@ export default function Sidebar() {
         <div className="canvas-close">
           <i className="fa fa-close"></i>
         </div>
-        <div className="canvas-search search-switch">
-          <i className="fa fa-search"></i>
+
+        <div className="canvas-search">
+          <h5 style={{ color: "black", marginTop: "10px" }}>D-Fitness Gym</h5>
         </div>
+
         <nav className="canvas-menu mobile-menu">
           <ul>
             {navItemsList.map((item) => (
@@ -22,17 +26,20 @@ export default function Sidebar() {
         </nav>
         <div id="mobile-menu-wrap"></div>
         <div className="canvas-social">
-          <Link href="#">
+          <Link href="https://www.facebook.com" target="_blank">
             <i className="fa fa-facebook"></i>
           </Link>
-          <Link href="#">
-            <i className="fa fa-twitter"></i>
-          </Link>
-          <Link href="#">
-            <i className="fa fa-youtube-play"></i>
-          </Link>
-          <Link href="#">
+          <Link href="https://www.instagram.com" target="_blank">
             <i className="fa fa-instagram"></i>
+          </Link>
+          <Link href="https://wa.me/919108720358" target="_blank">
+            <i className="fa fa-whatsapp"></i>
+          </Link>
+          <Link href="mailto:dfitnessgym2025@gmail.com" target="_blank">
+            <i className="fa fa-envelope-o"></i>
+          </Link>
+          <Link href="https://www.youtube.com" target="_blank">
+            <i className="fa fa-youtube-play"></i>
           </Link>
         </div>
       </div>
