@@ -160,6 +160,7 @@ export type Transaction = {
   status: TransactionStatus;
   modeOfPayment: PaymentMode;
   subscriptionId: string | null;
+  offerId?: string | null;
   description: string | null;
   paymentGatewayId: string | null;
   createdOn: string; // From the example data
