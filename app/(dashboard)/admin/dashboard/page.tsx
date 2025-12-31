@@ -327,7 +327,7 @@ export default function AdminDashboardPage() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
       {/* 1. Core Statistics */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {coreStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
@@ -401,7 +401,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* 3. Operational Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {operationalStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
