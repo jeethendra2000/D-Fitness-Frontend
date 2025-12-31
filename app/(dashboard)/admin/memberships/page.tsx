@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import MembershipForm from "@/components/adminComponents/forms/MembershipForm";
 import { Membership, MembershipType, Status } from "@/configs/dataTypes";
@@ -11,11 +10,11 @@ export default function MembershipsPage() {
   const apiUrl = `${API_BASE_URL}/Memberships`;
 
   const columns: GridColDef<Membership>[] = [
-    { field: "name", headerName: "Membership Name", flex: 1, minWidth: 120 },
+    { field: "name", headerName: "Membership Name", flex: 0.5, minWidth: 120 },
     {
       field: "amount",
       headerName: "Amount",
-      flex: 0.5,
+      flex: 0.3,
       minWidth: 100,
       type: "number",
       renderCell: (params: GridRenderCellParams<Membership, number>) =>
@@ -24,11 +23,11 @@ export default function MembershipsPage() {
     {
       field: "duration",
       headerName: "Duration (days)",
-      flex: 0.5,
+      flex: 0.25,
       type: "number",
-      minWidth: 120,
+      minWidth: 100,
     },
-    { field: "type", headerName: "Type", flex: 0.4, minWidth: 120 },
+    { field: "type", headerName: "Type", flex: 0.25, minWidth: 100 },
     {
       field: "description",
       headerName: "Description",
@@ -54,14 +53,8 @@ export default function MembershipsPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialMembership}
-      // Note: No payloadConverter needed here if your backend accepts JSON for Memberships (Standard)
-      // If your backend uses [FromForm] for Memberships too, you will need to add a converter similar to Trainers.
       renderForm={(data, setData, readOnly) => (
-        <MembershipForm
-          data={data}
-          setData={setData}
-          readOnly={readOnly} // ✅ Pass readOnly here
-        />
+        <MembershipForm data={data} setData={setData} readOnly={readOnly} />
       )}
     />
   );
