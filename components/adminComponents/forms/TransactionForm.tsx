@@ -23,6 +23,7 @@ interface UserOption {
   type: "Customer" | "Employee";
   name: string;
   description: string;
+  salary?: number; // ✅ Added salary field
 }
 
 interface SubscriptionOption {
@@ -89,6 +90,7 @@ export default function TransactionForm({
           type: "Employee",
           name: e.fullName || `${e.firstname} ${e.lastname}`,
           description: `${e.jobTitle} - ${e.phoneNumber}`,
+          salary: e.salary, // ✅ Store salary from API
         }));
 
         setCustomers(custOptions);
@@ -125,7 +127,6 @@ export default function TransactionForm({
 
   // --- Derived State ---
 
-  // 1. Account Options
   const accountOptions = useMemo(() => {
     switch (data.transactionType) {
       case TransactionType.Salary:
@@ -139,18 +140,10 @@ export default function TransactionForm({
     }
   }, [data.transactionType, customers, employees]);
 
-  // 2. ✅ Filter Subscriptions Logic
   const filteredSubscriptions = useMemo(() => {
     return subscriptions.filter((s) => {
-      // Must match selected customer
       if (s.customerId !== data.accountId) return false;
-
-      // ✅ Rule: Always show the subscription if it is the one currently linked (for Edit mode)
-      if (data.subscriptionId && s.id === data.subscriptionId) {
-        return true;
-      }
-
-      // ✅ Rule: Otherwise, only show Active or Inactive (for picking new ones)
+      if (data.subscriptionId && s.id === data.subscriptionId) return true;
       return (
         s.status === SubscriptionStatus.Active ||
         s.status === SubscriptionStatus.Inactive
@@ -223,11 +216,21 @@ export default function TransactionForm({
         getOptionLabel={(option) => `${option.name} (${option.description})`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_, newValue) => {
+          let newAmount = 0;
+
+          // ✅ Auto-populate Salary Logic
+          if (
+            data.transactionType === TransactionType.Salary &&
+            newValue?.salary
+          ) {
+            newAmount = newValue.salary;
+          }
+
           setData((prev) => ({
             ...prev,
             accountId: newValue?.id || "",
             subscriptionId: null,
-            amount: 0,
+            amount: newAmount, // Set salary amount or reset to 0
           }));
         }}
         renderInput={(params) => (
