@@ -13,7 +13,12 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridPaginationModel, // Import this
+} from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,6 +47,14 @@ export default function GenericCrudTable<T extends { id: string }>({
 }: GenericCrudTableProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // ✅ 1. Add Pagination State
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0, // MUI uses 0-based index
+    pageSize: 10,
+  });
+  const [rowCount, setRowCount] = useState(0); // Total records on server
+
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<T | null>(null);
   const [viewData, setViewData] = useState<T | null>(null);
@@ -65,14 +78,21 @@ export default function GenericCrudTable<T extends { id: string }>({
     setSnackbar({ open: true, message, severity });
   };
 
-  // ✅ FIX 1: Wrap fetchData in useCallback to stabilize the function reference
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(apiUrl);
+      const queryParams = new URLSearchParams({
+        pageNo: (paginationModel.page + 1).toString(),
+        pageSize: paginationModel.pageSize.toString(),
+      });
+
+      const url = `${apiUrl}?${queryParams.toString()}`;
+      console.log("Fetching:", url);
+      const res = await fetch(url);
 
       if (res.status === 204) {
         setRows([]);
+        setRowCount(0);
         return;
       }
 
@@ -81,16 +101,24 @@ export default function GenericCrudTable<T extends { id: string }>({
       }
 
       const json = await res.json();
-      setRows(Array.isArray(json) ? json : json.data || []);
+
+      if (json.data && Array.isArray(json.data)) {
+        setRows(json.data);
+        setRowCount(json.totalCount || 0);
+      } else if (Array.isArray(json)) {
+        setRows(json);
+        setRowCount(json.length);
+      } else {
+        setRows([]);
+        setRowCount(0);
+      }
     } catch (err) {
       console.error("Fetch error:", err);
       showSnackbar("Failed to fetch data", "error");
     } finally {
       setLoading(false);
     }
-  }, [apiUrl]); // Added dependency
-
-  // ✅ FIX 1 (Cont): Added fetchData to dependency array
+  }, [apiUrl, paginationModel]);
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -127,10 +155,11 @@ export default function GenericCrudTable<T extends { id: string }>({
         showSnackbar(`Delete failed: ${errorData}`, "error");
         return;
       }
+      // Optimistic update or refetch
       setRows((prev) => prev.filter((r) => r.id !== deleteDialog.id));
+      setRowCount((prev) => prev - 1); // Decrement count
       showSnackbar("Deleted successfully", "success");
     } catch {
-      // ✅ FIX 2: Removed unused variable (e)
       showSnackbar("Delete error", "error");
     } finally {
       setDeleteDialog({ open: false });
@@ -165,7 +194,7 @@ export default function GenericCrudTable<T extends { id: string }>({
         return;
       }
 
-      await fetchData();
+      await fetchData(); // Refetch to see new data/sort order
       setOpen(false);
       setViewData(null);
       showSnackbar(
@@ -216,9 +245,16 @@ export default function GenericCrudTable<T extends { id: string }>({
         loading={loading}
         autoHeight
         disableRowSelectionOnClick
-        pageSizeOptions={[5, 10, 20]}
         localeText={{ noRowsLabel: "No records found" }}
+        // ✅ 4. Configure Server-Side Pagination Props
+        paginationMode="server"
+        rowCount={rowCount}
+        pageSizeOptions={[5, 10, 20]}
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
       />
+
+      {/* Dialogs and Snackbars remain unchanged */}
       <Dialog
         open={open}
         onClose={() => {

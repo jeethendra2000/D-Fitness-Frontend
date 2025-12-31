@@ -11,17 +11,49 @@ export default function CustomersPage() {
   const apiUrl = `${API_BASE_URL}/Customers`;
 
   const columns: GridColDef<Customer>[] = [
-    { field: "fullName", headerName: "Full Name", flex: 1, minWidth: 150 },
-    { field: "email", headerName: "Email", flex: 1, minWidth: 150 },
-    { field: "phoneNumber", headerName: "Phone", flex: 0.8 },
-    { field: "gender", headerName: "Gender", flex: 0.5 },
-    { field: "address", headerName: "Address", flex: 0.5 },
+    { field: "fullName", headerName: "Full Name", flex: 0.5, minWidth: 150 },
+    { field: "email", headerName: "Email", flex: 0.5, minWidth: 150 },
+    { field: "phoneNumber", headerName: "Phone", flex: 0.3, minWidth: 120 },
+    { field: "gender", headerName: "Gender", flex: 0.25, minWidth: 80 },
+    { field: "address", headerName: "Address", flex: 0.5, minWidth: 100 },
+    {
+      field: "trainerRequired",
+      headerName: "Trainer",
+      flex: 0.2,
+      minWidth: 70,
+    },
     {
       field: "joinedDate",
       headerName: "Joined Date",
-      flex: 0.5,
+      flex: 0.3,
       valueFormatter: (value) =>
         value ? new Date(value).toLocaleDateString() : "—",
+      minWidth: 120,
+    },
+    {
+      field: "createdOn",
+      headerName: "Created On",
+      flex: 0.4,
+      minWidth: 180,
+      valueFormatter: (value: any) => {
+        if (!value) return "—";
+
+        const dateStr = value as string;
+
+        const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+
+        return new Date(utcString)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toUpperCase();
+      },
     },
   ];
 
@@ -34,54 +66,46 @@ export default function CustomersPage() {
     gender: Gender.Male,
     dateOfBirth: new Date().toISOString().split("T")[0],
     address: "",
-    height: 100,
-    weight: 50,
+    height: 0,
+    weight: 0,
     trainerRequired: false,
     trainerId: null,
     joinedDate: new Date().toISOString().split("T")[0],
+    createdOn: new Date().toISOString(), // Required by Account type
+    profileImageUrl: null,
     profileImageFile: null,
   };
 
-  // ✅ Converts JSON State -> FormData for .NET Backend
   const transformCustomerPayload = (
     data: Customer,
     isUpdate: boolean
   ): FormData => {
     const formData = new FormData();
 
-    // Map keys to match Backend DTO Property Names exactly
-    // .NET DTO: Firstname, Lastname, Email, etc.
-
+    // Account Fields
     if (data.firstname) formData.append("Firstname", data.firstname);
     if (data.lastname) formData.append("Lastname", data.lastname);
     if (data.email) formData.append("Email", data.email);
     if (data.phoneNumber) formData.append("PhoneNumber", data.phoneNumber);
     if (data.gender) formData.append("Gender", data.gender);
     if (data.address) formData.append("Address", data.address || "");
-
-    // Dates: .NET DateOnly expects "yyyy-MM-dd"
     if (data.dateOfBirth) {
       formData.append("DateOfBirth", data.dateOfBirth.split("T")[0]);
     }
+
+    // Customer Specific Fields
     if (data.joinedDate) {
       formData.append("JoinedDate", data.joinedDate.split("T")[0]);
     }
-
-    // Numbers
     formData.append("Height", data.height.toString());
     formData.append("Weight", data.weight.toString());
-
-    // Boolean
     formData.append("TrainerRequired", data.trainerRequired.toString());
 
-    // Nullable Guid
+    // Nullable Guid Logic
     if (data.trainerId) {
       formData.append("TrainerId", data.trainerId);
     } else if (isUpdate) {
-      // If updating and we want to clear it, backend might need empty string or specific handling
-      // Usually, simply omitting it keeps existing, or sending empty string sets null
-      // depending on .NET binding configuration.
-      formData.append("TrainerId", "");
+      formData.append("TrainerId", ""); // Send empty string to unassign in backend
     }
 
     // File Upload
@@ -98,7 +122,6 @@ export default function CustomersPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialCustomer}
-      // ✅ Pass the converter logic
       payloadConverter={transformCustomerPayload}
       renderForm={(data, setData, readOnly) => (
         <CustomerForm data={data} setData={setData} readOnly={readOnly} />

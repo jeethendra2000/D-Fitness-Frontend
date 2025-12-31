@@ -1,43 +1,25 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
-import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 import TransactionForm from "@/components/adminComponents/forms/TransactionForm";
 import {
-  PaymentMode,
+  PaymentType,
   Transaction,
   TransactionStatus,
   TransactionType,
+  Account,
+  Employee,
+  Subscription,
+  Membership,
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
-
-interface User {
-  id: string;
-  firebase_UID: string;
-  fullName?: string;
-}
-
-interface Employee {
-  id: string;
-  firebase_UID: string;
-  jobTitle: string;
-  fullName?: string;
-}
-
-interface Subscription {
-  id: string;
-  membershipID: string;
-}
-
-interface Membership {
-  id: string;
-  name: string;
-}
 
 export default function TransactionsPage() {
   const apiUrl = `${API_BASE_URL}/Transactions`;
 
-  const [userMap, setUserMap] = useState<Record<string, string>>({});
+  const [AccountMap, setAccountMap] = useState<Record<string, string>>({});
   const [subscriptionMap, setSubscriptionMap] = useState<
     Record<string, string>
   >({});
@@ -59,7 +41,7 @@ export default function TransactionsPage() {
           memRes.json(),
         ]);
 
-        const customers: User[] = Array.isArray(custJson)
+        const customers: Account[] = Array.isArray(custJson)
           ? custJson
           : custJson.data || [];
         const employees: Employee[] = Array.isArray(empJson)
@@ -78,32 +60,25 @@ export default function TransactionsPage() {
           if (m.id) memNameMap[m.id] = m.name;
         });
 
-        // 2. User Map (Combined)
+        // 2. Account Map
         const uMap: Record<string, string> = {};
         customers.forEach((u) => {
-          if (u.id)
-            uMap[u.id] = u.fullName
-              ? `${u.fullName} (Customer)`
-              : `Customer (${u.firebase_UID})`;
+          const name = u.fullName || `${u.firstname} ${u.lastname}`;
+          uMap[u.id] = `${name} (Customer)`;
         });
         employees.forEach((e) => {
-          if (e.id)
-            uMap[e.id] = e.fullName
-              ? `${e.fullName} (Staff)`
-              : `Employee (${e.jobTitle})`;
+          const name = e.fullName || `${e.firstname} ${e.lastname}`;
+          uMap[e.id] = `${name} (${e.jobTitle})`;
         });
 
         // 3. Subscription Map
         const subMap: Record<string, string> = {};
         subscriptions.forEach((s) => {
-          if (s.id) {
-            const membershipName =
-              memNameMap[s.membershipID] || "Unknown Membership";
-            subMap[s.id] = `${membershipName} (${s.id.substring(0, 8)}...)`;
-          }
+          const memName = memNameMap[s.membershipId] || "Unknown Plan";
+          subMap[s.id] = `${memName}`;
         });
 
-        setUserMap(uMap);
+        setAccountMap(uMap);
         setSubscriptionMap(subMap);
       } catch (err) {
         console.error("Failed to fetch mappings", err);
@@ -115,72 +90,91 @@ export default function TransactionsPage() {
 
   const columns: GridColDef<Transaction>[] = [
     {
-      field: "createdOn",
-      headerName: "Date & Time",
-      flex: 1.2,
-      minWidth: 180,
-      renderCell: (params: GridRenderCellParams<Transaction, string>) => {
-        if (!params.value) return "";
-        return new Date(params.value).toLocaleString();
-      },
+      field: "accountId",
+      headerName: "Account",
+      flex: 0.7,
+      minWidth: 150,
+      renderCell: (params) => AccountMap[params.value] || params.value || "—",
     },
     {
-      field: "payerId",
-      headerName: "Payer",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => userMap[params.value ?? ""] || "—",
-    },
-    {
-      field: "payeeId",
-      headerName: "Payee",
-      flex: 1,
-      minWidth: 150,
-      renderCell: (params) => userMap[params.value ?? ""] || "—",
+      field: "transactionType",
+      headerName: "Type",
+      flex: 0.5,
+      minWidth: 120,
     },
     {
       field: "amount",
       headerName: "Amount",
-      flex: 0.6,
+      flex: 0.3,
       minWidth: 100,
-      renderCell: (params) =>
-        params.value != null ? `₹${params.value.toFixed(2)}` : "₹0.00",
-    },
-    {
-      field: "type",
-      headerName: "Type",
-      flex: 0.8,
-      minWidth: 120,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 0.8,
-      minWidth: 120,
+      valueFormatter: (val: any) => {
+        const num = val as number;
+        return num != null ? `₹${num.toFixed(2)}` : "₹0";
+      },
     },
     {
       field: "subscriptionId",
       headerName: "Subscription",
-      flex: 1.2,
-      minWidth: 200,
+      flex: 0.5,
+      minWidth: 120,
       renderCell: (params) =>
-        params.value ? subscriptionMap[params.value] || params.value : "—",
+        params.value ? subscriptionMap[params.value] || "Subscription" : "—",
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 0.3,
+      minWidth: 100,
+      renderCell: (params) => (
+        <span
+          className={`px-2 py-1 rounded text-xs font-semibold ${
+            params.value === "Completed"
+              ? "bg-green-100 text-green-800"
+              : params.value === "Pending"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-red-100 text-red-800"
+          }`}
+        >
+          {params.value}
+        </span>
+      ),
+    },
+    {
+      field: "createdOn",
+      headerName: "Created On",
+      flex: 0.4,
+      minWidth: 180,
+      valueFormatter: (value: any) => {
+        if (!value) return "—";
+        const dateStr = value as string;
+        const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+        return new Date(utcString)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toUpperCase();
+      },
     },
   ];
 
   const initialTransaction: Transaction = {
     id: "",
-    createdOn: new Date().toISOString(),
-    payerId: "",
-    payeeId: "",
-    amount: 0,
-    type: TransactionType.SubscriptionPayment,
+    accountId: "",
+    transactionType: TransactionType.SubscriptionPayment,
     status: TransactionStatus.Pending,
-    modeOfPayment: PaymentMode.Cash,
+    amount: 0,
+    paymentType: PaymentType.Cash,
     subscriptionId: null,
-    offerId: null,
+    paymentReferenceId: "",
     description: "",
-    paymentGatewayId: "",
+    transactionDate: new Date().toISOString(),
+    createdOn: new Date().toISOString(),
   };
 
   return (
@@ -189,7 +183,6 @@ export default function TransactionsPage() {
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialTransaction}
-      // ✅ Pass readOnly to the form
       renderForm={(data, setData, readOnly) => (
         <TransactionForm data={data} setData={setData} readOnly={readOnly} />
       )}

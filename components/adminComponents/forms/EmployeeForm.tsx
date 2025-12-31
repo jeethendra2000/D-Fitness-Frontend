@@ -30,14 +30,13 @@ export default function EmployeeForm({
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync preview if external data changes
+  // Sync preview if external data changes (e.g. view different row)
   useEffect(() => {
     if (data) {
       setImagePreview(data.profileImageUrl || null);
     }
-  }, [data]);
+  }, [data?.id, data?.profileImageUrl]);
 
-  // ✅ Guard Clause
   if (!data) {
     return <Box sx={{ p: 2 }}>Loading form data...</Box>;
   }
@@ -56,9 +55,11 @@ export default function EmployeeForm({
       setData({ ...data, [field]: e.target.value });
     };
 
+  // Safe number handler to avoid NaN on empty input
   const handleNumberChange =
     (field: keyof Employee) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setData({ ...data, [field]: Number(e.target.value) });
+      const val = e.target.value;
+      setData({ ...data, [field]: val === "" ? 0 : Number(val) });
     };
 
   return (
@@ -155,8 +156,10 @@ export default function EmployeeForm({
         <TextField
           select
           label="Gender"
-          value={data.gender || ""}
-          onChange={handleChange("gender")}
+          value={data.gender || Gender.Male}
+          onChange={(e) =>
+            setData({ ...data, gender: e.target.value as Gender })
+          }
           fullWidth
           required
           disabled={readOnly}
@@ -241,7 +244,7 @@ export default function EmployeeForm({
         label="Status"
         select
         value={data.status || Status.Active}
-        onChange={handleChange("status")}
+        onChange={(e) => setData({ ...data, status: e.target.value as Status })}
         fullWidth
         disabled={readOnly}
       >

@@ -7,6 +7,7 @@ export type ApiResponse<T> = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
+
 export enum Gender {
   Male = "Male",
   Female = "Female",
@@ -16,7 +17,6 @@ export enum Status {
   Active = "Active",
   Inactive = "Inactive",
 }
-
 export enum MembershipType {
   Monthly = "Monthly",
   Quarterly = "Quarterly",
@@ -24,14 +24,21 @@ export enum MembershipType {
   Annual = "Annual",
   Custom = "Custom",
 }
-
+export enum SubscriptionStatus {
+  New = "New",
+  Inactive = "Inactive",
+  Active = "Active",
+  Paused = "Paused",
+  Expired = "Expired",
+  Cancelled = "Cancelled",
+}
 export enum TransactionType {
   SubscriptionPayment = "SubscriptionPayment",
   Salary = "Salary",
+  Expense = "Expense",
   Refund = "Refund",
   Other = "Other",
 }
-
 export enum TransactionStatus {
   Pending = "Pending",
   Completed = "Completed",
@@ -39,12 +46,12 @@ export enum TransactionStatus {
   Cancelled = "Cancelled",
   Refunded = "Refunded",
 }
-export enum PaymentMode {
-  Card = "Card",
-  NetBanking = "NetBanking",
+export enum PaymentType {
   Cash = "Cash",
   UPI = "UPI",
+  Card = "Card",
   Wallet = "Wallet",
+  NetBanking = "NetBanking",
   Other = "Other",
 }
 export enum EnquiryStatus {
@@ -57,79 +64,55 @@ export type Role = {
   id: string;
 };
 
-export type Employee = {
+// --- BASE ENTITIES ---
+
+// Base 'Account' Type
+export type Account = {
   id: string;
-  // Account Fields
   firstname: string;
   lastname: string;
-  fullName?: string;
+  fullName?: string; // Optional frontend helper
   email: string;
   phoneNumber: string;
   gender: Gender;
-  dateOfBirth: string; // YYYY-MM-DD
-  address?: string;
-  profileImageUrl?: string;
-  profileImageFile?: File | null; // ✅ Added for upload
+  dateOfBirth: string; // DateOnly ("YYYY-MM-DD")
+  address?: string | null;
+  // description?: string | null;
+  createdOn: string; // DateTime ISO
+  profileImageUrl?: string | null;
+  profileImageFile?: File | null; // Frontend helper for upload
+};
 
-  // Employee Fields
+// --- DERIVED ENTITIES ---
+
+// Employee extends Account
+export type Employee = Account & {
   jobTitle: string;
   hireDate: string;
   salary: number;
   yearsOfExperience: number;
-  bio?: string;
-  status: Status;
-};
-
-export type Trainer = {
-  id: string;
-  // Account Fields
-  firstname?: string;
-  lastname?: string;
-  fullName?: string;
-  email?: string;
-  phoneNumber?: string;
-  gender?: string;
-  dateOfBirth?: string;
-  address?: string;
-  profileImageUrl?: string;
-  profileImageFile?: File | null;
-
-  // Employee Fields
-  jobTitle: string;
-  hireDate: string; // ISO date
-  salary: number;
-  specialization: string;
-  yearsOfExperience: number;
   bio?: string | null;
   status: Status;
+};
 
-  // Trainer Fields
+// Trainer extends Employee
+export type Trainer = Employee & {
+  specialization: string;
   certification?: string | null;
-  availableFrom?: string | null; // "HH:mm:ss"
-  availableTo?: string | null; // "HH:mm:ss"
+  availableFrom?: string | null; // TimeOnly ("HH:mm:ss")
+  availableTo?: string | null; // TimeOnly ("HH:mm:ss")
 };
 
-export type Customer = {
-  id: string;
-  // Account Fields
-  firstname?: string;
-  lastname?: string;
-  fullName?: string;
-  email?: string;
-  phoneNumber?: string;
-  gender?: string;
-  dateOfBirth: string;
-  address?: string;
-  trainerRequired: boolean;
-  trainerId: string | null;
-  profileImageUrl?: string;
-  profileImageFile?: File | null;
-
-  // Customer Fields
-  weight: number;
+// Customer extends Account
+export type Customer = Account & {
   height: number;
-  joinedDate: string;
+  weight: number;
+  joinedDate: string; // DateOnly ("YYYY-MM-DD")
+  trainerRequired: boolean;
+  trainerId?: string | null;
 };
+
+// --- OTHER ENTITIES ---
 
 export type Membership = {
   id: string;
@@ -140,32 +123,28 @@ export type Membership = {
   type: MembershipType;
   status: Status;
 };
-
 export type Subscription = {
   id: string;
   customerId: string;
-  membershipID: string;
-  startDate: string;
-  endDate: string;
-  status: Status;
-  autoRenew: boolean;
+  membershipId: string;
+  startDate: string; // DateOnly
+  endDate: string; // DateOnly
+  status: SubscriptionStatus;
+  createdOn: string;
 };
-
 export type Transaction = {
-  id: string; // From the example data
-  payerId: string;
-  payeeId: string;
+  id: string;
+  accountId: string;
+  transactionType: TransactionType;
+  subscriptionId?: string | null;
   amount: number;
-  type: TransactionType;
+  paymentType: PaymentType;
+  paymentReferenceId?: string | null;
+  description?: string | null;
   status: TransactionStatus;
-  modeOfPayment: PaymentMode;
-  subscriptionId: string | null;
-  offerId?: string | null;
-  description: string | null;
-  paymentGatewayId: string | null;
-  createdOn: string; // From the example data
+  transactionDate: string; // DateTime ISO
+  createdOn: string; // DateTime ISO
 };
-
 export type Enquiry = {
   id: string;
   fullName: string;
@@ -175,7 +154,6 @@ export type Enquiry = {
   status: EnquiryStatus;
   submittedAt: string;
 };
-
 export type Offer = {
   id: string;
   code: string;

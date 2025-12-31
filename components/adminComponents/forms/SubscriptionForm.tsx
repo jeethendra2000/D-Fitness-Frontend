@@ -4,15 +4,13 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   TextField,
-  Checkbox,
-  FormControlLabel,
   CircularProgress,
   Autocomplete,
   MenuItem,
 } from "@mui/material";
 import {
   Subscription,
-  Status,
+  SubscriptionStatus,
   Customer,
   Membership,
 } from "@/configs/dataTypes";
@@ -32,7 +30,8 @@ export default function SubscriptionForm({
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(false);
-  const statusOptions = Object.values(Status);
+
+  const statusOptions = Object.values(SubscriptionStatus);
 
   // 1. Fetch Options
   useEffect(() => {
@@ -75,9 +74,9 @@ export default function SubscriptionForm({
 
   // 2. ✅ Auto-Calculate End Date logic
   useEffect(() => {
-    if (readOnly || !data.startDate || !data.membershipID) return;
+    if (readOnly || !data.startDate || !data.membershipId) return;
 
-    const selectedMem = memberships.find((m) => m.id === data.membershipID);
+    const selectedMem = memberships.find((m) => m.id === data.membershipId);
 
     if (selectedMem && selectedMem.duration) {
       const start = new Date(data.startDate);
@@ -94,7 +93,7 @@ export default function SubscriptionForm({
     }
   }, [
     data.startDate,
-    data.membershipID,
+    data.membershipId,
     memberships,
     readOnly,
     setData,
@@ -103,37 +102,37 @@ export default function SubscriptionForm({
 
   // 3. ✅ Auto-Update Status based on Date Range
   useEffect(() => {
-    // Skip if readOnly or dates are missing
     if (readOnly || !data.startDate || !data.endDate) return;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to midnight
+    today.setHours(0, 0, 0, 0);
 
     const start = new Date(data.startDate);
-    start.setHours(0, 0, 0, 0); // Normalize start date
+    start.setHours(0, 0, 0, 0);
 
     const end = new Date(data.endDate);
-    end.setHours(0, 0, 0, 0); // Normalize end date
+    end.setHours(0, 0, 0, 0);
 
-    let newStatus = Status.Inactive;
+    let newStatus = SubscriptionStatus.Inactive;
 
     // Logic: If today is within the range [Start, End], status is Active
     if (today >= start && today <= end) {
-      newStatus = Status.Active;
+      newStatus = SubscriptionStatus.Active;
+    } else if (today > end) {
+      // Optional: Set to Expired if date passed
+      newStatus = SubscriptionStatus.Expired;
     }
 
-    // Only update state if the status is different (prevents infinite loops)
     if (data.status !== newStatus) {
       setData((prev) => ({ ...prev, status: newStatus }));
     }
   }, [data.startDate, data.endDate, readOnly, setData, data.status]);
 
-  // Safe finds for Autocomplete
   const selectedCustomer =
     customers.find((c) => c.id === data.customerId) || null;
 
   const selectedMembership =
-    memberships.find((m) => m.id === data.membershipID) || null;
+    memberships.find((m) => m.id === data.membershipId) || null;
 
   if (!data) return <Box>Loading...</Box>;
 
@@ -182,7 +181,7 @@ export default function SubscriptionForm({
           option.name ? `${option.name} (${option.duration} Days)` : ""
         }
         onChange={(_, newValue) =>
-          setData({ ...data, membershipID: newValue?.id ?? "" })
+          setData({ ...data, membershipId: newValue?.id ?? "" })
         }
         renderInput={(params) => (
           <TextField
@@ -230,12 +229,14 @@ export default function SubscriptionForm({
         />
       </Box>
 
-      {/* Status - Note: This field is now auto-calculated but still manually overridable if needed */}
+      {/* Status */}
       <TextField
         select
         label="Status (Auto-calculated)"
-        value={data.status || Status.Inactive}
-        onChange={(e) => setData({ ...data, status: e.target.value as Status })}
+        value={data.status || SubscriptionStatus.New}
+        onChange={(e) =>
+          setData({ ...data, status: e.target.value as SubscriptionStatus })
+        }
         fullWidth
         required
         disabled={readOnly}
@@ -247,18 +248,6 @@ export default function SubscriptionForm({
           </MenuItem>
         ))}
       </TextField>
-
-      {/* Auto Renew */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={data.autoRenew}
-            onChange={(e) => setData({ ...data, autoRenew: e.target.checked })}
-            disabled={readOnly}
-          />
-        }
-        label="Auto Renew"
-      />
     </Box>
   );
 }
