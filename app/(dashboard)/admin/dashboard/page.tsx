@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
       color: "text-indigo-600 bg-indigo-100",
     },
     {
-      title: "Enquiries",
+      title: "New Enquiries",
       value: String(dashboardStats.pendingEnquiries),
       icon: <MessageSquare />,
       color: "text-yellow-600 bg-yellow-100",
