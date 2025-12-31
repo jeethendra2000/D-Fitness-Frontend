@@ -17,7 +17,7 @@ import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  GridPaginationModel, // Import this
+  GridPaginationModel,
 } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -48,12 +48,12 @@ export default function GenericCrudTable<T extends { id: string }>({
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ 1. Add Pagination State
+  // ✅ 1. Update Pagination Defaults (10 per page)
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
-    page: 0, // MUI uses 0-based index
+    page: 0,
     pageSize: 10,
   });
-  const [rowCount, setRowCount] = useState(0); // Total records on server
+  const [rowCount, setRowCount] = useState(0);
 
   const [open, setOpen] = useState(false);
   const [editData, setEditData] = useState<T | null>(null);
@@ -78,6 +78,11 @@ export default function GenericCrudTable<T extends { id: string }>({
     setSnackbar({ open: true, message, severity });
   };
 
+  // ✅ Helper to clean URL for CUD operations
+  const getBaseUrl = () => {
+    return apiUrl.split("?")[0];
+  };
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -86,7 +91,9 @@ export default function GenericCrudTable<T extends { id: string }>({
         pageSize: paginationModel.pageSize.toString(),
       });
 
-      const url = `${apiUrl}?${queryParams.toString()}`;
+      const separator = apiUrl.includes("?") ? "&" : "?";
+      const url = `${apiUrl}${separator}${queryParams.toString()}`;
+
       console.log("Fetching:", url);
       const res = await fetch(url);
 
@@ -101,17 +108,34 @@ export default function GenericCrudTable<T extends { id: string }>({
       }
 
       const json = await res.json();
+      let fetchedData: T[] = [];
 
       if (json.data && Array.isArray(json.data)) {
-        setRows(json.data);
+        fetchedData = json.data;
         setRowCount(json.totalCount || 0);
       } else if (Array.isArray(json)) {
-        setRows(json);
+        fetchedData = json;
         setRowCount(json.length);
       } else {
-        setRows([]);
+        fetchedData = [];
         setRowCount(0);
       }
+
+      // ✅ 2. Sort Logic: If 'createdOn' exists, show newest first
+      if (fetchedData.length > 0) {
+        // We cast to 'any' to safely check for the property existence on generic T
+        const firstItem = fetchedData[0] as any;
+
+        if (firstItem.createdOn) {
+          fetchedData.sort((a: any, b: any) => {
+            const dateA = new Date(a.createdOn).getTime();
+            const dateB = new Date(b.createdOn).getTime();
+            return dateB - dateA; // Descending order (Newest first)
+          });
+        }
+      }
+
+      setRows(fetchedData);
     } catch (err) {
       console.error("Fetch error:", err);
       showSnackbar("Failed to fetch data", "error");
@@ -119,6 +143,7 @@ export default function GenericCrudTable<T extends { id: string }>({
       setLoading(false);
     }
   }, [apiUrl, paginationModel]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -147,7 +172,8 @@ export default function GenericCrudTable<T extends { id: string }>({
   const handleDelete = async () => {
     if (!deleteDialog.id) return;
     try {
-      const res = await fetch(`${apiUrl}/${deleteDialog.id}`, {
+      const baseUrl = getBaseUrl();
+      const res = await fetch(`${baseUrl}/${deleteDialog.id}`, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -155,9 +181,8 @@ export default function GenericCrudTable<T extends { id: string }>({
         showSnackbar(`Delete failed: ${errorData}`, "error");
         return;
       }
-      // Optimistic update or refetch
       setRows((prev) => prev.filter((r) => r.id !== deleteDialog.id));
-      setRowCount((prev) => prev - 1); // Decrement count
+      setRowCount((prev) => prev - 1);
       showSnackbar("Deleted successfully", "success");
     } catch {
       showSnackbar("Delete error", "error");
@@ -170,7 +195,9 @@ export default function GenericCrudTable<T extends { id: string }>({
     try {
       const isUpdate = !!editData;
       const method = isUpdate ? "PATCH" : "POST";
-      const url = isUpdate ? `${apiUrl}/${editData.id}` : apiUrl;
+
+      const baseUrl = getBaseUrl();
+      const url = isUpdate ? `${baseUrl}/${editData.id}` : baseUrl;
 
       let body: string | FormData;
       let headers: HeadersInit = {};
@@ -181,6 +208,8 @@ export default function GenericCrudTable<T extends { id: string }>({
         headers = { "Content-Type": "application/json" };
         body = JSON.stringify(formData);
       }
+
+      console.log(`Submitting to: ${url}`);
 
       const res = await fetch(url, {
         method,
@@ -194,7 +223,7 @@ export default function GenericCrudTable<T extends { id: string }>({
         return;
       }
 
-      await fetchData(); // Refetch to see new data/sort order
+      await fetchData();
       setOpen(false);
       setViewData(null);
       showSnackbar(
@@ -246,15 +275,14 @@ export default function GenericCrudTable<T extends { id: string }>({
         autoHeight
         disableRowSelectionOnClick
         localeText={{ noRowsLabel: "No records found" }}
-        // ✅ 4. Configure Server-Side Pagination Props
         paginationMode="server"
         rowCount={rowCount}
-        pageSizeOptions={[5, 10, 20]}
+        // ✅ 3. Update Page Size Options
+        pageSizeOptions={[10, 20, 30]}
         paginationModel={paginationModel}
         onPaginationModelChange={setPaginationModel}
       />
 
-      {/* Dialogs and Snackbars remain unchanged */}
       <Dialog
         open={open}
         onClose={() => {
