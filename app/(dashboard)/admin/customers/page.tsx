@@ -11,9 +11,9 @@ export default function CustomersPage() {
   const apiUrl = `${API_BASE_URL}/Customers`;
 
   const columns: GridColDef<Customer>[] = [
-    { field: "fullName", headerName: "Full Name", flex: 0.7, minWidth: 150 },
-    { field: "email", headerName: "Email", flex: 0.7, minWidth: 150 },
-    { field: "phoneNumber", headerName: "Phone", flex: 0.4, minWidth: 120 },
+    { field: "fullName", headerName: "Full Name", flex: 0.5, minWidth: 150 },
+    { field: "email", headerName: "Email", flex: 0.5, minWidth: 150 },
+    { field: "phoneNumber", headerName: "Phone", flex: 0.3, minWidth: 120 },
     { field: "gender", headerName: "Gender", flex: 0.25, minWidth: 80 },
     { field: "address", headerName: "Address", flex: 0.5, minWidth: 100 },
     {
@@ -28,7 +28,32 @@ export default function CustomersPage() {
       flex: 0.3,
       valueFormatter: (value) =>
         value ? new Date(value).toLocaleDateString() : "—",
-      minWidth: 100,
+      minWidth: 120,
+    },
+    {
+      field: "createdOn",
+      headerName: "Created On",
+      flex: 0.4,
+      minWidth: 180,
+      valueFormatter: (value: any) => {
+        if (!value) return "—";
+
+        const dateStr = value as string;
+
+        const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+
+        return new Date(utcString)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toUpperCase();
+      },
     },
   ];
 
