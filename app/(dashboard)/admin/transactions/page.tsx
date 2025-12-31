@@ -146,11 +146,8 @@ export default function TransactionsPage() {
       minWidth: 180,
       valueFormatter: (value: any) => {
         if (!value) return "—";
-
         const dateStr = value as string;
-
         const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
-
         return new Date(utcString)
           .toLocaleString("en-IN", {
             timeZone: "Asia/Kolkata",

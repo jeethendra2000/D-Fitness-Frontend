@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   TextField,
@@ -99,7 +99,7 @@ export default function TransactionForm({
         const subOptions: SubscriptionOption[] = sList.map((s: any) => ({
           id: s.id,
           customerId: s.customerId,
-          membershipName: memMap[s.membershipId] || "Unknown Plan", // Using membershipId (lowercase d)
+          membershipName: memMap[s.membershipId] || "Unknown Plan",
           status: s.status,
           startDate: s.startDate,
           endDate: s.endDate,
@@ -117,9 +117,19 @@ export default function TransactionForm({
 
   // --- Derived State ---
 
-  // 1. Filter Account Options based on Transaction Type
-  const accountOptions =
-    data.transactionType === TransactionType.Salary ? employees : customers;
+  // 1. ✅ Logic for Account Options based on Transaction Type
+  const accountOptions = useMemo(() => {
+    switch (data.transactionType) {
+      case TransactionType.Salary:
+      case TransactionType.Expense:
+        return employees; // Salary & Expense -> Employees
+      case TransactionType.Other:
+        return [...customers, ...employees]; // Other -> Everyone
+      case TransactionType.SubscriptionPayment:
+      default:
+        return customers; // Subscription/Refund -> Customers
+    }
+  }, [data.transactionType, customers, employees]);
 
   // 2. Filter Subscriptions based on selected Account (only if it's a Customer)
   const filteredSubscriptions = subscriptions.filter(
@@ -144,6 +154,20 @@ export default function TransactionForm({
     }));
   };
 
+  // Helper for Input Label
+  const getAccountLabel = () => {
+    switch (data.transactionType) {
+      case TransactionType.Salary:
+        return "Select Employee (Receiver)";
+      case TransactionType.Expense:
+        return "Select Employee (Spender)";
+      case TransactionType.Other:
+        return "Select Account (Customer or Employee)";
+      default:
+        return "Select Customer";
+    }
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
       {/* 1. Transaction Type */}
@@ -163,12 +187,18 @@ export default function TransactionForm({
         ))}
       </TextField>
 
-      {/* 2. Account Selection (Dynamic based on Type) */}
+      {/* 2. Account Selection (Dynamic) */}
       <Autocomplete
         options={accountOptions}
         loading={loading}
         value={selectedAccount}
         disabled={readOnly}
+        // Group options if "Other" is selected to distinguish lists
+        groupBy={
+          data.transactionType === TransactionType.Other
+            ? (option) => option.type
+            : undefined
+        }
         getOptionLabel={(option) => `${option.name} (${option.description})`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_, newValue) => {
@@ -181,11 +211,7 @@ export default function TransactionForm({
         renderInput={(params) => (
           <TextField
             {...params}
-            label={
-              data.transactionType === TransactionType.Salary
-                ? "Select Employee (Receiver)"
-                : "Select Customer (Payer)"
-            }
+            label={getAccountLabel()}
             required
             InputProps={{
               ...params.InputProps,
