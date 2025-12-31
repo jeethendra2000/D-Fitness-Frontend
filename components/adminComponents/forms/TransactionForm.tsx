@@ -29,6 +29,8 @@ interface SubscriptionOption {
   customerId: string;
   membershipName: string;
   status: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface TransactionFormProps {
@@ -97,8 +99,10 @@ export default function TransactionForm({
         const subOptions: SubscriptionOption[] = sList.map((s: any) => ({
           id: s.id,
           customerId: s.customerId,
-          membershipName: memMap[s.membershipID] || "Unknown Plan",
+          membershipName: memMap[s.membershipId] || "Unknown Plan", // Using membershipId (lowercase d)
           status: s.status,
+          startDate: s.startDate,
+          endDate: s.endDate,
         }));
         setSubscriptions(subOptions);
       } catch (err) {
@@ -204,7 +208,11 @@ export default function TransactionForm({
           value={selectedSubscription}
           disabled={readOnly || !data.accountId}
           getOptionLabel={(option) =>
-            `${option.membershipName} (${option.status})`
+            `${option.membershipName} (${option.status}: ${new Date(
+              option.startDate
+            ).toLocaleDateString()} - ${new Date(
+              option.endDate
+            ).toLocaleDateString()})`
           }
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onChange={(_, newValue) => {
@@ -285,7 +293,6 @@ export default function TransactionForm({
         required
         disabled={readOnly}
       >
-        {/* ✅ FIX 2: Use PaymentType for iteration */}
         {Object.values(PaymentType).map((m) => (
           <MenuItem key={m} value={m}>
             {m}

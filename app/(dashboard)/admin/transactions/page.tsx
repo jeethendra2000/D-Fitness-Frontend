@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { GridColDef } from "@mui/x-data-grid";
 import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTable";
 import TransactionForm from "@/components/adminComponents/forms/TransactionForm";
 import {
-  // ✅ FIX 1: Import PaymentType instead of PaymentMode
   PaymentType,
   Transaction,
   TransactionStatus,
@@ -13,10 +12,8 @@ import {
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 
-// Helper interfaces for mapping ID -> Name
 interface User {
   id: string;
-  firebase_UID: string;
   fullName?: string;
   firstname?: string;
   lastname?: string;
@@ -28,7 +25,7 @@ interface Employee extends User {
 
 interface Subscription {
   id: string;
-  membershipID: string;
+  membershipId: string;
 }
 
 interface Membership {
@@ -94,8 +91,8 @@ export default function TransactionsPage() {
         // 3. Subscription Map
         const subMap: Record<string, string> = {};
         subscriptions.forEach((s) => {
-          const memName = memNameMap[s.membershipID] || "Unknown Plan";
-          subMap[s.id] = `${memName} (#${s.id.substring(0, 4)})`;
+          const memName = memNameMap[s.membershipId] || "Unknown Plan";
+          subMap[s.id] = `${memName}`;
         });
 
         setUserMap(uMap);
@@ -114,7 +111,6 @@ export default function TransactionsPage() {
       headerName: "Date",
       flex: 0.8,
       minWidth: 160,
-      // ✅ FIX 2: Explicitly cast 'value' to string
       valueFormatter: (value: any) => {
         if (!value) return "—";
         const dateStr = value as string;
@@ -145,7 +141,6 @@ export default function TransactionsPage() {
       headerName: "Amount",
       flex: 0.5,
       minWidth: 100,
-      // ✅ FIX 3: Explicitly cast 'val' to number
       valueFormatter: (val: any) => {
         const num = val as number;
         return num != null ? `₹${num.toFixed(2)}` : "₹0";
@@ -176,7 +171,7 @@ export default function TransactionsPage() {
       flex: 0.8,
       minWidth: 150,
       renderCell: (params) =>
-        params.value ? subscriptionMap[params.value] || "View Details" : "—",
+        params.value ? subscriptionMap[params.value] || "Subscription" : "—",
     },
   ];
 
@@ -186,7 +181,6 @@ export default function TransactionsPage() {
     transactionType: TransactionType.SubscriptionPayment,
     status: TransactionStatus.Pending,
     amount: 0,
-    // ✅ FIX 4: Use PaymentType
     paymentType: PaymentType.Cash,
     subscriptionId: null,
     paymentReferenceId: "",
@@ -195,40 +189,12 @@ export default function TransactionsPage() {
     createdOn: new Date().toISOString(),
   };
 
-  const transformTransactionPayload = (
-    data: Transaction,
-    isUpdate: boolean
-  ): FormData => {
-    const formData = new FormData();
-
-    formData.append("AccountId", data.accountId);
-    formData.append("TransactionType", data.transactionType);
-    formData.append("Amount", data.amount.toString());
-    formData.append("PaymentType", data.paymentType);
-    formData.append("Status", data.status);
-
-    if (data.subscriptionId) {
-      formData.append("SubscriptionId", data.subscriptionId);
-    }
-
-    if (data.paymentReferenceId) {
-      formData.append("PaymentReferenceId", data.paymentReferenceId);
-    }
-
-    if (data.description) {
-      formData.append("Description", data.description);
-    }
-
-    return formData;
-  };
-
   return (
     <GenericCrudTable<Transaction>
       title="Transactions"
       apiUrl={apiUrl}
       columns={columns}
       initialFormData={initialTransaction}
-      payloadConverter={transformTransactionPayload}
       renderForm={(data, setData, readOnly) => (
         <TransactionForm data={data} setData={setData} readOnly={readOnly} />
       )}
