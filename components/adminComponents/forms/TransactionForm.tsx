@@ -7,53 +7,34 @@ import {
   MenuItem,
   Autocomplete,
   CircularProgress,
-  Typography,
 } from "@mui/material";
 import {
   TransactionType,
   TransactionStatus,
-  PaymentMode,
+  PaymentType,
   Transaction,
-  Subscription,
-  Offer,
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 
-interface CustomerData {
-  id: string;
-  firebase_UID: string;
-  fullName?: string;
-}
-
-interface EmployeeData {
-  id: string;
-  firebase_UID: string;
-  jobTitle: string;
-  fullName?: string;
-}
-
-interface TransactionFormProps {
-  data: Transaction;
-  setData: React.Dispatch<React.SetStateAction<Transaction>>;
-  readOnly?: boolean; // ✅ Added readOnly prop
-}
-
-// Unified interface for Payer/Payee selection
+// --- Types for Dropdowns ---
 interface UserOption {
   id: string;
   type: "Customer" | "Employee";
+  name: string;
   description: string;
 }
 
 interface SubscriptionOption {
   id: string;
-  membershipID: string;
+  customerId: string;
   membershipName: string;
+  status: string;
 }
 
-interface Membership {
-  id: string;
-  name: string;
+interface TransactionFormProps {
+  data: Transaction;
+  setData: React.Dispatch<React.SetStateAction<Transaction>>;
+  readOnly?: boolean;
 }
 
 export default function TransactionForm({
@@ -61,282 +42,187 @@ export default function TransactionForm({
   setData,
   readOnly,
 }: TransactionFormProps) {
-  const [users, setUsers] = useState<UserOption[]>([]);
+  const [customers, setCustomers] = useState<UserOption[]>([]);
+  const [employees, setEmployees] = useState<UserOption[]>([]);
   const [subscriptions, setSubscriptions] = useState<SubscriptionOption[]>([]);
-  const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const typeOptions = Object.values(TransactionType);
-  const statusOptions = Object.values(TransactionStatus);
-  const paymentModeOptions = Object.values(PaymentMode);
-
-  // ✅ Fetch all data
+  // --- Fetch Data ---
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDependencies = async () => {
       setLoading(true);
       try {
-        const [custRes, empRes, subRes, memRes, offerRes] = await Promise.all([
+        const [custRes, empRes, subRes, memRes] = await Promise.all([
           fetch(`${API_BASE_URL}/Customers`),
           fetch(`${API_BASE_URL}/Employees`),
           fetch(`${API_BASE_URL}/Subscriptions`),
           fetch(`${API_BASE_URL}/Memberships`),
-          fetch(`${API_BASE_URL}/Offers`),
         ]);
 
-        const [custJson, empJson, subJson, memJson, offerJson] =
-          await Promise.all([
-            custRes.json(),
-            empRes.json(),
-            subRes.json(),
-            memRes.json(),
-            offerRes.json(),
-          ]);
+        const [custJson, empJson, subJson, memJson] = await Promise.all([
+          custRes.json(),
+          empRes.json(),
+          subRes.json(),
+          memRes.json(),
+        ]);
 
-        const customers: CustomerData[] = Array.isArray(custJson)
-          ? custJson
-          : custJson.data || [];
-        const employees: EmployeeData[] = Array.isArray(empJson)
-          ? empJson
-          : empJson.data || [];
-        const subscriptionList = Array.isArray(subJson)
-          ? subJson
-          : subJson.data || [];
-        const membershipList: Membership[] = Array.isArray(memJson)
-          ? memJson
-          : memJson.data || [];
-        const offerList: Offer[] = Array.isArray(offerJson)
-          ? offerJson
-          : offerJson.data || [];
+        const cList = Array.isArray(custJson) ? custJson : custJson.data || [];
+        const eList = Array.isArray(empJson) ? empJson : empJson.data || [];
+        const sList = Array.isArray(subJson) ? subJson : subJson.data || [];
+        const mList = Array.isArray(memJson) ? memJson : memJson.data || [];
 
-        // --- 1. Combine Users ---
-        const combinedUsers: UserOption[] = [];
+        // 1. Process Customers
+        const custOptions: UserOption[] = cList.map((c: any) => ({
+          id: c.id,
+          type: "Customer",
+          name: c.fullName || `${c.firstname} ${c.lastname}`,
+          description: `Customer - ${c.phoneNumber}`,
+        }));
 
-        customers.forEach((c) => {
-          combinedUsers.push({
-            id: c.id,
-            type: "Customer",
-            description: c.fullName
-              ? `${c.fullName} (Customer)`
-              : `Customer (${c.firebase_UID})`,
-          });
-        });
+        // 2. Process Employees
+        const empOptions: UserOption[] = eList.map((e: any) => ({
+          id: e.id,
+          type: "Employee",
+          name: e.fullName || `${e.firstname} ${e.lastname}`,
+          description: `${e.jobTitle} - ${e.phoneNumber}`,
+        }));
 
-        employees.forEach((e) => {
-          combinedUsers.push({
-            id: e.id,
-            type: "Employee",
-            description: e.fullName
-              ? `${e.fullName} (${e.jobTitle})`
-              : `Employee (${e.jobTitle})`,
-          });
-        });
+        setCustomers(custOptions);
+        setEmployees(empOptions);
 
-        setUsers(combinedUsers);
-        setOffers(offerList);
+        // 3. Process Subscriptions (Map Membership ID -> Name)
+        const memMap: Record<string, string> = {};
+        mList.forEach((m: any) => (memMap[m.id] = m.name));
 
-        // --- 2. Process Subscriptions ---
-        const memNameMap = membershipList.reduce((acc, m) => {
-          acc[m.id] = m.name;
-          return acc;
-        }, {} as Record<string, string>);
-
-        setSubscriptions(
-          subscriptionList.map((s: Subscription) => ({
-            id: s.id,
-            membershipID: s.membershipID,
-            membershipName: memNameMap[s.membershipID] || "Unknown",
-          }))
-        );
-      } catch (error) {
-        console.error("Failed to fetch transaction dependencies:", error);
+        const subOptions: SubscriptionOption[] = sList.map((s: any) => ({
+          id: s.id,
+          customerId: s.customerId,
+          membershipName: memMap[s.membershipID] || "Unknown Plan",
+          status: s.status,
+        }));
+        setSubscriptions(subOptions);
+      } catch (err) {
+        console.error("Error fetching dependencies:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchDependencies();
   }, []);
 
-  const selectedPayer = users.find((u) => u.id === data.payerId) || null;
-  const selectedPayee = users.find((u) => u.id === data.payeeId) || null;
+  // --- Derived State ---
+
+  // 1. Filter Account Options based on Transaction Type
+  const accountOptions =
+    data.transactionType === TransactionType.Salary ? employees : customers;
+
+  // 2. Filter Subscriptions based on selected Account (only if it's a Customer)
+  const filteredSubscriptions = subscriptions.filter(
+    (s) => s.customerId === data.accountId
+  );
+
+  const selectedAccount =
+    accountOptions.find((u) => u.id === data.accountId) || null;
+
   const selectedSubscription =
-    subscriptions.find((s) => s.id === data.subscriptionId) || null;
-  const selectedOffer = offers.find((o) => o.id === data.offerId) || null;
+    filteredSubscriptions.find((s) => s.id === data.subscriptionId) || null;
 
-  const showSubscriptionField =
-    data.type === TransactionType.SubscriptionPayment;
+  // --- Handlers ---
 
-  // Clear subscription if type changes to something else
-  useEffect(() => {
-    if (!readOnly && !showSubscriptionField && data.subscriptionId !== null) {
-      setData((prev) => ({ ...prev, subscriptionId: null }));
-    }
-  }, [showSubscriptionField, data.subscriptionId, setData, readOnly]);
-
-  if (!data) return <Box>Loading...</Box>;
+  const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newType = e.target.value as TransactionType;
+    setData((prev) => ({
+      ...prev,
+      transactionType: newType,
+      accountId: "", // Reset account on type change
+      subscriptionId: null, // Reset sub on type change
+    }));
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-      {/* Created On (View Only) */}
-      {readOnly && (
-        <TextField
-          label="Transaction Date"
-          value={new Date(data.createdOn).toLocaleString()}
-          disabled
-          fullWidth
-        />
-      )}
-
-      {/* Payer */}
-      <Autocomplete
-        options={users}
-        loading={loading}
-        value={selectedPayer}
-        disabled={readOnly}
-        getOptionLabel={(option) => option.description}
-        getOptionKey={(option) => option.id}
-        onChange={(_, newValue) =>
-          setData({ ...data, payerId: newValue?.id ?? "" })
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Payer (From)"
-            required
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
-      />
-
-      {/* Payee */}
-      <Autocomplete
-        options={users}
-        loading={loading}
-        value={selectedPayee}
-        disabled={readOnly}
-        getOptionLabel={(option) => option.description}
-        getOptionKey={(option) => option.id}
-        onChange={(_, newValue) =>
-          setData({ ...data, payeeId: newValue?.id ?? "" })
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Payee (To)"
-            required
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
-      />
-
-      {/* Amount */}
-      <TextField
-        label="Amount (₹)"
-        type="number"
-        inputProps={{ min: 1 }}
-        value={data.amount}
-        onChange={(e) =>
-          setData({ ...data, amount: parseFloat(e.target.value) })
-        }
-        required
-        disabled={readOnly}
-        fullWidth
-      />
-
-      <Box sx={{ display: "flex", gap: 2 }}>
-        {/* Type */}
-        <TextField
-          select
-          label="Transaction Type"
-          value={data.type}
-          onChange={(e) =>
-            setData({ ...data, type: e.target.value as TransactionType })
-          }
-          required
-          disabled={readOnly}
-          fullWidth
-        >
-          {typeOptions.map((opt) => (
-            <MenuItem key={opt} value={opt}>
-              {opt}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        {/* Status */}
-        <TextField
-          select
-          label="Status"
-          value={data.status}
-          onChange={(e) =>
-            setData({ ...data, status: e.target.value as TransactionStatus })
-          }
-          required
-          disabled={readOnly}
-          fullWidth
-        >
-          {statusOptions.map((opt) => (
-            <MenuItem key={opt} value={opt}>
-              {opt}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
-
-      {/* Mode of Payment */}
+      {/* 1. Transaction Type */}
       <TextField
         select
-        label="Mode of Payment"
-        value={data.modeOfPayment || PaymentMode.Cash}
-        onChange={(e) =>
-          setData({ ...data, modeOfPayment: e.target.value as PaymentMode })
-        }
+        label="Transaction Type"
+        value={data.transactionType}
+        onChange={handleTypeChange}
+        fullWidth
         required
         disabled={readOnly}
-        fullWidth
       >
-        {paymentModeOptions.map((opt) => (
-          <MenuItem key={opt} value={opt}>
-            {opt}
+        {Object.values(TransactionType).map((t) => (
+          <MenuItem key={t} value={t}>
+            {t}
           </MenuItem>
         ))}
       </TextField>
 
-      {/* Subscription (Conditional) */}
-      {(showSubscriptionField || readOnly) && (
+      {/* 2. Account Selection (Dynamic based on Type) */}
+      <Autocomplete
+        options={accountOptions}
+        loading={loading}
+        value={selectedAccount}
+        disabled={readOnly}
+        getOptionLabel={(option) => `${option.name} (${option.description})`}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        onChange={(_, newValue) => {
+          setData((prev) => ({
+            ...prev,
+            accountId: newValue?.id || "",
+            subscriptionId: null, // Reset subscription when user changes
+          }));
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label={
+              data.transactionType === TransactionType.Salary
+                ? "Select Employee (Receiver)"
+                : "Select Customer (Payer)"
+            }
+            required
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loading && <CircularProgress size={20} />}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+      />
+
+      {/* 3. Subscription Selection (Only if Subscription Payment) */}
+      {data.transactionType === TransactionType.SubscriptionPayment && (
         <Autocomplete
-          options={subscriptions}
+          options={filteredSubscriptions}
           loading={loading}
           value={selectedSubscription}
-          disabled={readOnly}
+          disabled={readOnly || !data.accountId}
           getOptionLabel={(option) =>
-            `${option.membershipName} (${option.id.substring(0, 8)}...)`
+            `${option.membershipName} (${option.status})`
           }
-          onChange={(_, newValue) =>
-            setData({ ...data, subscriptionId: newValue?.id ?? null })
-          }
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          onChange={(_, newValue) => {
+            setData((prev) => ({
+              ...prev,
+              subscriptionId: newValue?.id || null,
+            }));
+          }}
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Linked Subscription"
+              label="Link Subscription"
               helperText={
-                !showSubscriptionField ? "Visible because View Mode" : ""
+                !data.accountId
+                  ? "Select a customer first"
+                  : filteredSubscriptions.length === 0
+                  ? "No subscriptions found for this customer"
+                  : ""
               }
               InputProps={{
                 ...params.InputProps,
@@ -352,51 +238,79 @@ export default function TransactionForm({
         />
       )}
 
-      {/* Offer (Optional) */}
-      <Autocomplete
-        options={offers}
-        loading={loading}
-        value={selectedOffer}
-        disabled={readOnly}
-        getOptionLabel={(option) => `${option.code} (${option.description})`}
-        onChange={(_, newValue) =>
-          setData({ ...data, offerId: newValue?.id ?? null })
+      {/* 4. Amount & Status */}
+      <Box sx={{ display: "flex", gap: 2 }}>
+        <TextField
+          label="Amount (₹)"
+          type="number"
+          value={data.amount}
+          onChange={(e) =>
+            setData({ ...data, amount: parseFloat(e.target.value) || 0 })
+          }
+          fullWidth
+          required
+          disabled={readOnly}
+        />
+        <TextField
+          select
+          label="Status"
+          value={data.status}
+          onChange={(e) =>
+            setData({
+              ...data,
+              status: e.target.value as TransactionStatus,
+            })
+          }
+          fullWidth
+          required
+          disabled={readOnly}
+        >
+          {Object.values(TransactionStatus).map((s) => (
+            <MenuItem key={s} value={s}>
+              {s}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Box>
+
+      {/* 5. Payment Details */}
+      <TextField
+        select
+        label="Payment Mode"
+        value={data.paymentType}
+        onChange={(e) =>
+          setData({ ...data, paymentType: e.target.value as PaymentType })
         }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Applied Offer / Discount"
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
+        fullWidth
+        required
+        disabled={readOnly}
+      >
+        {/* ✅ FIX 2: Use PaymentType for iteration */}
+        {Object.values(PaymentType).map((m) => (
+          <MenuItem key={m} value={m}>
+            {m}
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <TextField
+        label="Payment Reference ID (Optional)"
+        value={data.paymentReferenceId || ""}
+        onChange={(e) =>
+          setData({ ...data, paymentReferenceId: e.target.value })
+        }
+        fullWidth
+        disabled={readOnly}
       />
 
-      {/* Description */}
       <TextField
-        label="Description"
+        label="Description / Notes"
         value={data.description || ""}
         onChange={(e) => setData({ ...data, description: e.target.value })}
         multiline
-        rows={2}
-        disabled={readOnly}
+        rows={3}
         fullWidth
-      />
-
-      {/* Payment Gateway ID */}
-      <TextField
-        label="Payment Gateway ID"
-        value={data.paymentGatewayId || ""}
-        onChange={(e) => setData({ ...data, paymentGatewayId: e.target.value })}
         disabled={readOnly}
-        fullWidth
       />
     </Box>
   );
