@@ -6,7 +6,7 @@ import GenericCrudTable from "@/components/adminComponents/tables/GenericCrudTab
 import SubscriptionForm from "@/components/adminComponents/forms/SubscriptionForm";
 import {
   Subscription,
-  Status,
+  SubscriptionStatus,
   Customer,
   Membership,
 } from "@/configs/dataTypes";
@@ -20,7 +20,6 @@ export default function SubscriptionsPage() {
     {}
   );
 
-  // ✅ Fetch related data for display mapping
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,10 +39,8 @@ export default function SubscriptionsPage() {
           ? memJson
           : memJson.data || [];
 
-        // Create Map: ID -> Display Name
         const cMap: Record<string, string> = {};
         customers.forEach((c) => {
-          // Prefer fullName, fallback to email
           cMap[c.id] = c.fullName || c.email || "Unknown Customer";
         });
 
@@ -72,7 +69,7 @@ export default function SubscriptionsPage() {
         customerMap[params.value || ""] || "—",
     },
     {
-      field: "membershipID",
+      field: "membershipId",
       headerName: "Membership",
       flex: 1,
       minWidth: 150,
@@ -102,11 +99,29 @@ export default function SubscriptionsPage() {
       },
     },
     {
-      field: "autoRenew",
-      headerName: "Auto Renew",
+      field: "createdOn",
+      headerName: "Created On",
       flex: 0.4,
-      minWidth: 100,
-      renderCell: (params) => (params.value ? "Yes" : "No"),
+      minWidth: 180,
+      valueFormatter: (value: any) => {
+        if (!value) return "—";
+
+        const dateStr = value as string;
+
+        const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+
+        return new Date(utcString)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toUpperCase();
+      },
     },
     {
       field: "status",
@@ -119,13 +134,13 @@ export default function SubscriptionsPage() {
   const initialSubscription: Subscription = {
     id: "",
     customerId: "",
-    membershipID: "",
+    membershipId: "",
     startDate: new Date().toISOString().split("T")[0],
     endDate: new Date(new Date().setMonth(new Date().getMonth() + 1))
       .toISOString()
       .split("T")[0],
-    autoRenew: false,
-    status: Status.Inactive,
+    status: SubscriptionStatus.New,
+    createdOn: new Date().toISOString(),
   };
 
   return (
