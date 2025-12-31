@@ -13,6 +13,7 @@ import {
   TransactionStatus,
   PaymentType,
   Transaction,
+  SubscriptionStatus,
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
 
@@ -31,6 +32,7 @@ interface SubscriptionOption {
   status: string;
   startDate: string;
   endDate: string;
+  amount: number;
 }
 
 interface TransactionFormProps {
@@ -92,9 +94,14 @@ export default function TransactionForm({
         setCustomers(custOptions);
         setEmployees(empOptions);
 
-        // 3. Process Subscriptions (Map Membership ID -> Name)
+        // 3. Process Subscriptions
         const memMap: Record<string, string> = {};
-        mList.forEach((m: any) => (memMap[m.id] = m.name));
+        const memAmountMap: Record<string, number> = {};
+
+        mList.forEach((m: any) => {
+          memMap[m.id] = m.name;
+          memAmountMap[m.id] = m.amount;
+        });
 
         const subOptions: SubscriptionOption[] = sList.map((s: any) => ({
           id: s.id,
@@ -103,6 +110,7 @@ export default function TransactionForm({
           status: s.status,
           startDate: s.startDate,
           endDate: s.endDate,
+          amount: memAmountMap[s.membershipId] || 0,
         }));
         setSubscriptions(subOptions);
       } catch (err) {
@@ -117,24 +125,38 @@ export default function TransactionForm({
 
   // --- Derived State ---
 
-  // 1. ✅ Logic for Account Options based on Transaction Type
+  // 1. Account Options
   const accountOptions = useMemo(() => {
     switch (data.transactionType) {
       case TransactionType.Salary:
       case TransactionType.Expense:
-        return employees; // Salary & Expense -> Employees
+        return employees;
       case TransactionType.Other:
-        return [...customers, ...employees]; // Other -> Everyone
+        return [...customers, ...employees];
       case TransactionType.SubscriptionPayment:
       default:
-        return customers; // Subscription/Refund -> Customers
+        return customers;
     }
   }, [data.transactionType, customers, employees]);
 
-  // 2. Filter Subscriptions based on selected Account (only if it's a Customer)
-  const filteredSubscriptions = subscriptions.filter(
-    (s) => s.customerId === data.accountId
-  );
+  // 2. ✅ Filter Subscriptions Logic
+  const filteredSubscriptions = useMemo(() => {
+    return subscriptions.filter((s) => {
+      // Must match selected customer
+      if (s.customerId !== data.accountId) return false;
+
+      // ✅ Rule: Always show the subscription if it is the one currently linked (for Edit mode)
+      if (data.subscriptionId && s.id === data.subscriptionId) {
+        return true;
+      }
+
+      // ✅ Rule: Otherwise, only show Active or Inactive (for picking new ones)
+      return (
+        s.status === SubscriptionStatus.Active ||
+        s.status === SubscriptionStatus.Inactive
+      );
+    });
+  }, [subscriptions, data.accountId, data.subscriptionId]);
 
   const selectedAccount =
     accountOptions.find((u) => u.id === data.accountId) || null;
@@ -149,12 +171,12 @@ export default function TransactionForm({
     setData((prev) => ({
       ...prev,
       transactionType: newType,
-      accountId: "", // Reset account on type change
-      subscriptionId: null, // Reset sub on type change
+      accountId: "",
+      subscriptionId: null,
+      amount: 0,
     }));
   };
 
-  // Helper for Input Label
   const getAccountLabel = () => {
     switch (data.transactionType) {
       case TransactionType.Salary:
@@ -187,13 +209,12 @@ export default function TransactionForm({
         ))}
       </TextField>
 
-      {/* 2. Account Selection (Dynamic) */}
+      {/* 2. Account Selection */}
       <Autocomplete
         options={accountOptions}
         loading={loading}
         value={selectedAccount}
         disabled={readOnly}
-        // Group options if "Other" is selected to distinguish lists
         groupBy={
           data.transactionType === TransactionType.Other
             ? (option) => option.type
@@ -205,7 +226,8 @@ export default function TransactionForm({
           setData((prev) => ({
             ...prev,
             accountId: newValue?.id || "",
-            subscriptionId: null, // Reset subscription when user changes
+            subscriptionId: null,
+            amount: 0,
           }));
         }}
         renderInput={(params) => (
@@ -226,7 +248,7 @@ export default function TransactionForm({
         )}
       />
 
-      {/* 3. Subscription Selection (Only if Subscription Payment) */}
+      {/* 3. Subscription Selection */}
       {data.transactionType === TransactionType.SubscriptionPayment && (
         <Autocomplete
           options={filteredSubscriptions}
@@ -238,13 +260,14 @@ export default function TransactionForm({
               option.startDate
             ).toLocaleDateString()} - ${new Date(
               option.endDate
-            ).toLocaleDateString()})`
+            ).toLocaleDateString()}) - ₹${option.amount}`
           }
           isOptionEqualToValue={(option, value) => option.id === value.id}
           onChange={(_, newValue) => {
             setData((prev) => ({
               ...prev,
               subscriptionId: newValue?.id || null,
+              amount: newValue ? newValue.amount : 0,
             }));
           }}
           renderInput={(params) => (
@@ -255,8 +278,8 @@ export default function TransactionForm({
                 !data.accountId
                   ? "Select a customer first"
                   : filteredSubscriptions.length === 0
-                  ? "No subscriptions found for this customer"
-                  : ""
+                  ? "No Active/Inactive subscriptions found"
+                  : "Auto-fills amount on selection"
               }
               InputProps={{
                 ...params.InputProps,
@@ -327,7 +350,7 @@ export default function TransactionForm({
       </TextField>
 
       <TextField
-        label="Payment Reference ID (Optional)"
+        label="Payment Reference ID"
         value={data.paymentReferenceId || ""}
         onChange={(e) =>
           setData({ ...data, paymentReferenceId: e.target.value })
