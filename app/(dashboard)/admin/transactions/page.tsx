@@ -9,34 +9,17 @@ import {
   Transaction,
   TransactionStatus,
   TransactionType,
+  Account,
+  Employee,
+  Subscription,
+  Membership,
 } from "@/configs/dataTypes";
 import { API_BASE_URL } from "@/configs/constants";
-
-interface User {
-  id: string;
-  fullName?: string;
-  firstname?: string;
-  lastname?: string;
-}
-
-interface Employee extends User {
-  jobTitle: string;
-}
-
-interface Subscription {
-  id: string;
-  membershipId: string;
-}
-
-interface Membership {
-  id: string;
-  name: string;
-}
 
 export default function TransactionsPage() {
   const apiUrl = `${API_BASE_URL}/Transactions`;
 
-  const [userMap, setUserMap] = useState<Record<string, string>>({});
+  const [AccountMap, setAccountMap] = useState<Record<string, string>>({});
   const [subscriptionMap, setSubscriptionMap] = useState<
     Record<string, string>
   >({});
@@ -58,7 +41,7 @@ export default function TransactionsPage() {
           memRes.json(),
         ]);
 
-        const customers: User[] = Array.isArray(custJson)
+        const customers: Account[] = Array.isArray(custJson)
           ? custJson
           : custJson.data || [];
         const employees: Employee[] = Array.isArray(empJson)
@@ -77,7 +60,7 @@ export default function TransactionsPage() {
           if (m.id) memNameMap[m.id] = m.name;
         });
 
-        // 2. User Map
+        // 2. Account Map
         const uMap: Record<string, string> = {};
         customers.forEach((u) => {
           const name = u.fullName || `${u.firstname} ${u.lastname}`;
@@ -95,7 +78,7 @@ export default function TransactionsPage() {
           subMap[s.id] = `${memName}`;
         });
 
-        setUserMap(uMap);
+        setAccountMap(uMap);
         setSubscriptionMap(subMap);
       } catch (err) {
         console.error("Failed to fetch mappings", err);
@@ -107,39 +90,22 @@ export default function TransactionsPage() {
 
   const columns: GridColDef<Transaction>[] = [
     {
-      field: "createdOn",
-      headerName: "Date",
-      flex: 0.8,
-      minWidth: 160,
-      valueFormatter: (value: any) => {
-        if (!value) return "—";
-        const dateStr = value as string;
-        const dateString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
-        return new Date(dateString).toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          dateStyle: "medium",
-          timeStyle: "short",
-          hour12: true,
-        });
-      },
-    },
-    {
       field: "accountId",
-      headerName: "User / Account",
-      flex: 1,
-      minWidth: 180,
-      renderCell: (params) => userMap[params.value] || params.value || "—",
+      headerName: "Account",
+      flex: 0.7,
+      minWidth: 150,
+      renderCell: (params) => AccountMap[params.value] || params.value || "—",
     },
     {
       field: "transactionType",
       headerName: "Type",
-      flex: 0.7,
-      minWidth: 140,
+      flex: 0.5,
+      minWidth: 120,
     },
     {
       field: "amount",
       headerName: "Amount",
-      flex: 0.5,
+      flex: 0.3,
       minWidth: 100,
       valueFormatter: (val: any) => {
         const num = val as number;
@@ -147,9 +113,17 @@ export default function TransactionsPage() {
       },
     },
     {
+      field: "subscriptionId",
+      headerName: "Subscription",
+      flex: 0.5,
+      minWidth: 120,
+      renderCell: (params) =>
+        params.value ? subscriptionMap[params.value] || "Subscription" : "—",
+    },
+    {
       field: "status",
       headerName: "Status",
-      flex: 0.5,
+      flex: 0.3,
       minWidth: 100,
       renderCell: (params) => (
         <span
@@ -166,12 +140,29 @@ export default function TransactionsPage() {
       ),
     },
     {
-      field: "subscriptionId",
-      headerName: "Linked Sub.",
-      flex: 0.8,
-      minWidth: 150,
-      renderCell: (params) =>
-        params.value ? subscriptionMap[params.value] || "Subscription" : "—",
+      field: "createdOn",
+      headerName: "Created On",
+      flex: 0.4,
+      minWidth: 180,
+      valueFormatter: (value: any) => {
+        if (!value) return "—";
+
+        const dateStr = value as string;
+
+        const utcString = dateStr.endsWith("Z") ? dateStr : `${dateStr}Z`;
+
+        return new Date(utcString)
+          .toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .toUpperCase();
+      },
     },
   ];
 
