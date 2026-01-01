@@ -399,8 +399,8 @@ export default function AdminDashboardPage() {
               />
               <Tooltip
                 // Format currency for the tooltip popup
-                formatter={(value: number) => [
-                  formatCurrency(value),
+                formatter={(value: number | undefined) => [
+                  formatCurrency(value ?? 0),
                   "Revenue",
                 ]}
               />
