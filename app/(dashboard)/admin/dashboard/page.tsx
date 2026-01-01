@@ -353,8 +353,8 @@ export default function AdminDashboardPage() {
                     tickFormatter={(val) => `₹${val / 1000}k`}
                   />
                   <Tooltip
-                    formatter={(val: number) => [
-                      formatCurrency(val),
+                    formatter={(val: number | undefined ) => [
+                      formatCurrency(val ?? 0),
                       "Revenue",
                     ]}
                   />
