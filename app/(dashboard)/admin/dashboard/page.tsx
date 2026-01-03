@@ -10,11 +10,24 @@ import {
   LucideProps,
   Tag,
   User as UserIcon,
-  Star,
   List,
   BarChart3,
 } from "lucide-react";
 import { API_BASE_URL } from "@/configs/constants";
+import {
+  Subscription,
+  Transaction,
+  Enquiry,
+  Customer,
+  Employee,
+  Trainer,
+  Membership,
+  Offer,
+  SubscriptionStatus,
+  TransactionStatus,
+  EnquiryStatus,
+  TransactionType,
+} from "@/configs/dataTypes";
 
 // --- Recharts Imports ---
 import {
@@ -31,21 +44,7 @@ import {
   Cell,
 } from "recharts";
 
-// --- Types ---
-interface Transaction {
-  status: string;
-  amount: number;
-  createdOn: string;
-}
-
-interface Subscription {
-  status: string;
-}
-
-interface Enquiry {
-  status: string;
-}
-
+// --- Dashboard State Interface ---
 interface DashboardData {
   totalCustomers: number;
   totalEmployees: number;
@@ -85,12 +84,11 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
   </div>
 );
 
-// --- ✅ FIX 1: Robust Fetch Helper ---
-const fetchJson = async (url: string) => {
+// --- Fetch Helper with Generics ---
+const fetchJson = async <T,>(url: string): Promise<T[]> => {
   try {
     const response = await fetch(url);
 
-    // Handle 204 No Content explicitly
     if (response.status === 204) return [];
 
     if (!response.ok) {
@@ -98,9 +96,8 @@ const fetchJson = async (url: string) => {
       return [];
     }
 
-    // Check if body is empty before parsing
     const text = await response.text();
-    if (!text) return []; // Return empty array for empty body
+    if (!text) return [];
 
     const json = JSON.parse(text);
     return Array.isArray(json) ? json : json.data || [];
@@ -117,17 +114,20 @@ const formatCurrency = (amount: number) => {
   return `₹${amount.toLocaleString("en-IN")}`;
 };
 
-// --- Revenue Calculation ---
+// --- Revenue Calculation Logic ---
 const calculateRevenueByMonth = (
   transactions: Transaction[]
 ): MonthlyRevenueDataPoint[] => {
   const revenueMap: Record<string, number> = {};
 
   transactions.forEach((tx) => {
-    const isSuccess = ["Completed", "Success", "Active"].includes(tx.status);
+    const isIncome =
+      tx.status === TransactionStatus.Completed &&
+      (tx.transactionType === TransactionType.SubscriptionPayment ||
+        tx.transactionType === TransactionType.Other);
 
-    if (isSuccess && tx.amount > 0 && tx.createdOn) {
-      const date = new Date(tx.createdOn);
+    if (isIncome && tx.amount > 0 && tx.transactionDate) {
+      const date = new Date(tx.transactionDate);
       const year = date.getFullYear();
       const month = date.getMonth();
       const key = `${year}-${String(month + 1).padStart(2, "0")}`;
@@ -149,7 +149,7 @@ const calculateRevenueByMonth = (
       };
     });
 
-  return chartData.slice(-6); // Last 6 months
+  return chartData.slice(-6);
 };
 
 export default function AdminDashboardPage() {
@@ -185,52 +185,56 @@ export default function AdminDashboardPage() {
           customerData,
           employeeData,
           trainerData,
-          feedbackData,
+          // Removed feedbackData to fix tuple alignment
           membershipData,
           offerData,
           subscriptionData,
           transactionData,
           enquiryData,
         ] = await Promise.all([
-          fetchJson(`${API_BASE_URL}/Customers`),
-          fetchJson(`${API_BASE_URL}/Employees`),
-          fetchJson(`${API_BASE_URL}/Trainers`),
-          fetchJson(`${API_BASE_URL}/Feedbacks`),
-          fetchJson(`${API_BASE_URL}/Memberships`),
-          fetchJson(`${API_BASE_URL}/Offers`),
-          fetchJson(`${API_BASE_URL}/Subscriptions`),
-          fetchJson(`${API_BASE_URL}/Transactions`),
-          fetchJson(`${API_BASE_URL}/Enquiries`),
+          fetchJson<Customer>(`${API_BASE_URL}/Customers`),
+          fetchJson<Employee>(`${API_BASE_URL}/Employees`),
+          fetchJson<Trainer>(`${API_BASE_URL}/Trainers`),
+          // Removed fetch for Feedbacks
+          fetchJson<Membership>(`${API_BASE_URL}/Memberships`),
+          fetchJson<Offer>(`${API_BASE_URL}/Offers`),
+          fetchJson<Subscription>(`${API_BASE_URL}/Subscriptions`),
+          fetchJson<Transaction>(`${API_BASE_URL}/Transactions`),
+          fetchJson<Enquiry>(`${API_BASE_URL}/Enquiries`),
         ]);
 
         const activeSubscriptions = subscriptionData.filter(
-          (sub: Subscription) => sub.status === "Active"
+          (sub) => sub.status === SubscriptionStatus.Active
         ).length;
 
         const pendingEnquiries = enquiryData.filter(
-          (enq: Enquiry) => enq.status === "New"
+          (enq) => enq.status === EnquiryStatus.New
         ).length;
 
-        const monthlyRevenue = (transactionData as Transaction[]).reduce(
-          (sum, tx) => sum + (tx.amount || 0),
-          0
-        );
+        const totalRevenue = transactionData.reduce((sum, tx) => {
+          if (
+            tx.status === TransactionStatus.Completed &&
+            (tx.transactionType === TransactionType.SubscriptionPayment ||
+              tx.transactionType === TransactionType.Other)
+          ) {
+            return sum + (tx.amount || 0);
+          }
+          return sum;
+        }, 0);
 
-        setMonthlyRevenueChartData(
-          calculateRevenueByMonth(transactionData as Transaction[])
-        );
+        setMonthlyRevenueChartData(calculateRevenueByMonth(transactionData));
 
         setDashboardStats({
           totalCustomers: customerData.length,
           totalEmployees: employeeData.length,
           totalTrainers: trainerData.length,
-          totalFeedbacks: feedbackData.length,
+          totalFeedbacks: 0, // Placeholder as we removed the fetch
           totalMemberships: membershipData.length,
           totalOffers: offerData.length,
           totalTransactions: transactionData.length,
           activeSubscriptions,
           pendingEnquiries,
-          monthlyRevenue,
+          monthlyRevenue: totalRevenue,
           isLoading: false,
         });
       } catch (error) {
@@ -243,13 +247,14 @@ export default function AdminDashboardPage() {
   }, []);
 
   const chartColors = ["#4f46e5", "#10b981", "#ef4444", "#f59e0b"];
-  const totalUsers = dashboardStats.totalCustomers;
+  const totalCustomers = dashboardStats.totalCustomers;
   const activeSubs = dashboardStats.activeSubscriptions;
-  const inactiveSubs = totalUsers > activeSubs ? totalUsers - activeSubs : 0;
+  const inactiveCustomers =
+    totalCustomers > activeSubs ? totalCustomers - activeSubs : 0;
 
   const pieData = [
-    { name: "Active", value: activeSubs },
-    { name: "Inactive", value: inactiveSubs },
+    { name: "Active Subscribers", value: activeSubs },
+    { name: "Inactive / No Plan", value: inactiveCustomers },
   ];
 
   const coreStats = [
@@ -266,7 +271,7 @@ export default function AdminDashboardPage() {
       color: "text-green-600 bg-green-100",
     },
     {
-      title: "Revenue (Total)",
+      title: "Total Revenue",
       value: formatCurrency(dashboardStats.monthlyRevenue),
       icon: <Dumbbell />,
       color: "text-indigo-600 bg-indigo-100",
@@ -293,23 +298,17 @@ export default function AdminDashboardPage() {
       color: "text-orange-600 bg-orange-100",
     },
     {
-      title: "Total Memberships",
+      title: "Active Memberships",
       value: String(dashboardStats.totalMemberships),
       icon: <List />,
       color: "text-purple-600 bg-purple-100",
     },
     {
-      title: "Total Offers",
+      title: "Active Offers",
       value: String(dashboardStats.totalOffers),
       icon: <Tag />,
       color: "text-pink-600 bg-pink-100",
     },
-    // {
-    //   title: "Total Feedback",
-    //   value: String(dashboardStats.totalFeedbacks),
-    //   icon: <Star />,
-    //   color: "text-lime-600 bg-lime-100",
-    // },
   ];
 
   if (dashboardStats.isLoading) {
@@ -327,7 +326,7 @@ export default function AdminDashboardPage() {
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
 
       {/* 1. Core Statistics */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {coreStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
@@ -336,12 +335,10 @@ export default function AdminDashboardPage() {
       {/* 2. Charts Section */}
       {mounted && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* ✅ FIX 2: Explicit container heights to prevent Recharts width(-1) error */}
-
-          {/* Bar Chart */}
+          {/* Revenue Bar Chart */}
           <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-[400px] flex flex-col min-w-0">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Revenue Trend (Last 6 Months)
+              Revenue Trend (Income Only)
             </h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
@@ -353,8 +350,9 @@ export default function AdminDashboardPage() {
                     tickFormatter={(val) => `₹${val / 1000}k`}
                   />
                   <Tooltip
-                    formatter={(val: number | undefined ) => [
-                      formatCurrency(val ?? 0),
+                    // ✅ FIX: Use 'any' type to avoid strict Recharts type conflict
+                    formatter={(value: any) => [
+                      formatCurrency(Number(value) || 0),
                       "Revenue",
                     ]}
                   />
@@ -363,16 +361,17 @@ export default function AdminDashboardPage() {
                     dataKey="revenue"
                     fill={chartColors[0]}
                     radius={[4, 4, 0, 0]}
+                    name="Monthly Income"
                   />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* Pie Chart */}
+          {/* Customer Status Pie Chart */}
           <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-[400px] flex flex-col min-w-0">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Subscription Status
+              Customer Subscription Status
             </h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
@@ -401,7 +400,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* 3. Operational Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {operationalStats.map((stat) => (
           <StatCard key={stat.title} {...stat} />
         ))}
@@ -416,13 +415,15 @@ export default function AdminDashboardPage() {
           <ul className="space-y-4">
             <li className="flex justify-between border-b pb-2">
               <span className="text-green-600 font-medium">
-                New Subscription
+                System Initialized
               </span>
-              <span className="text-sm text-gray-500">2 hours ago</span>
+              <span className="text-sm text-gray-500">Just now</span>
             </li>
             <li className="flex justify-between border-b pb-2">
-              <span className="text-yellow-600 font-medium">New Enquiry</span>
-              <span className="text-sm text-gray-500">5 hours ago</span>
+              <span className="text-blue-600 font-medium">
+                Dashboard Loaded
+              </span>
+              <span className="text-sm text-gray-500">Just now</span>
             </li>
             <li className="text-center pt-2">
               <Link
@@ -439,7 +440,7 @@ export default function AdminDashboardPage() {
           <h3 className="text-xl font-semibold text-gray-800 mb-4">
             Quick Actions
           </h3>
-          <div className="space-y-1">
+          <div className="space-y-2">
             <Link
               href="/admin/enquiries"
               className="block p-3 bg-indigo-50 rounded-lg text-indigo-700 font-medium hover:bg-indigo-200 hover:!text-indigo-950 transition-colors"
@@ -453,10 +454,10 @@ export default function AdminDashboardPage() {
               Manage Employees
             </Link>
             <Link
-              href="/admin/memberships"
+              href="/admin/subscriptions"
               className="block p-3 bg-red-50 rounded-lg text-red-700 font-medium hover:bg-red-200 hover:!text-red-950 transition-colors"
             >
-              View Membership
+              Manage Subscriptions
             </Link>
           </div>
         </div>
