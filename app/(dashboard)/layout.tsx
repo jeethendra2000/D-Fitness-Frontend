@@ -7,6 +7,10 @@ import Search from "@/components/layoutComponents/search";
 import ToastProvider from "@/components/utilityComponents/ToastProvider";
 import MiniDrawerDashboard from "@/components/layoutComponents/miniDrawerDashboard";
 
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import admin from "@/firebaseAdmin";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -22,11 +26,21 @@ export const metadata: Metadata = {
   description: "D-Fitness Web application",
 };
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+   // Server-side protection: block access if no valid session cookie
+  const session = (await cookies()).get("session")?.value;
+  if (!session) redirect("/auth/login");
+
+  try {
+    await admin.auth().verifySessionCookie(session, true);
+  } catch (err) {
+    redirect("/auth/login");
+  }
+
   return (
     <html lang="en">
       <head>

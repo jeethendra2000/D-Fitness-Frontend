@@ -12,16 +12,29 @@ import "react-toastify/dist/ReactToastify.css";
 import CircularProgress from "@mui/material/CircularProgress";
 import Loader from "@/components/utilityComponents/Loader";
 
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+
+
 export default function LoginClient() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
-  const backendURL = process.env.NEXT_PUBLIC_API_BASE;
+  const [signInWithEmailAndPassword, user, hookLoading, hookError] =
+    useSignInWithEmailAndPassword(auth);
+
+  const mapFirebaseError = (err: unknown) => {
+    if (!(err instanceof Error)) return "Login failed. Please try again.";
+    const msg = err.message || "";
+    if (msg.includes("auth/user-not-found")) return "No account found for this email.";
+    if (msg.includes("auth/wrong-password")) return "Incorrect password.";
+    if (msg.includes("auth/invalid-email")) return "Invalid email address.";
+    if (msg.includes("auth/user-disabled")) return "This account has been disabled.";
+    return msg;
+  };
 
   async function handleLoginSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Prevent multiple clicks
     if (loading || redirecting) return;
     setLoading(true);
 
@@ -32,56 +45,29 @@ export default function LoginClient() {
       const password =
         (form.elements.namedItem("password") as HTMLInputElement)?.value || "";
 
-      // Firebase Sign In
-      const userCred = await signInWithEmailAndPassword(auth, email, password);
-      const idToken = await userCred.user.getIdToken();
+      // Firebase Sign In (client)
+      const userCred = await signInWithEmailAndPassword(email, password);
+      if (!userCred?.user) throw new Error("No user returned from Firebase");
 
-      // Send token to backend login endpoint. Include remember flag if you want session cookie
-      const resp = await fetch(`${backendURL}/auth/login/`, {
+      // Get ID token and create a secure session cookie via server API
+      const idToken = await userCred.user.getIdToken();
+      const resp = await fetch("/api/sessionLogin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tokenId: idToken, remember: true }),
-        credentials: "include", // Allow cookies (session cookie) if backend sets it
+        body: JSON.stringify({ idToken }),
       });
 
-      if (!resp.ok) {
-        const body = await resp.json().catch(() => ({}));
-        // Use || to safely check properties, ensuring a string is thrown
-        throw new Error(body.detail || body.error || "Login failed on backend");
-      }
+      if (!resp.ok) throw new Error("Failed to create server session");
 
-      const data = await resp.json();
-      console.log("Data: ", data);
-
-      // Assuming the role is nested in customClaims
-      const role = data?.customClaims?.role || "customer";
       toast.success("Login successful!", { autoClose: 1500 });
 
-      // Show full-screen loader while navigating
       setRedirecting(true);
-
-      // Allow cookie write to settle (Optional: added small delay for robustness)
       await new Promise((r) => setTimeout(r, 100));
-
-      const target =
-        role === "admin"
-          ? "/admin/dashboard"
-          : role === "trainer"
-          ? "/trainer/dashboard"
-          : "/customer/dashboard";
-
-      router.replace(target);
-
-      // FIX 1: Replaced 'any' with 'unknown' and safely access the message property (Line 69)
+      router.replace("/admin/dashboard");
     } catch (err: unknown) {
       console.log("Error: ", err);
-
-      let errorMessage = "Login failed";
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-
-      toast.error(errorMessage, { autoClose: 3000 });
+      const msg = mapFirebaseError(err instanceof Error ? err : hookError ?? err);
+      toast.error(msg, { autoClose: 3000 });
     } finally {
       setLoading(false);
     }
@@ -92,7 +78,6 @@ export default function LoginClient() {
       {redirecting && (
         <Loader message="Loading your dashboard..." dimBackground={true} />
       )}
-      {/* FIX 3: Removed aria-disabled from form. It's now correctly applied to the button/inputs. */}
       <form onSubmit={handleLoginSubmit}>
         <input
           type="text"
@@ -109,7 +94,7 @@ export default function LoginClient() {
             </a>
           </p>
           <p>
-            <Link href="/auth/forgot-password" style={{ color: "#ff1313" }}>
+            <Link href="/forgot-password" style={{ color: "#ff1313" }}>
               Forgot Password
             </Link>
           </p>
