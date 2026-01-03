@@ -26,7 +26,7 @@ export const TeamMembersList = [
   {
     name: "Jayanth Kumar",
     role: "Developer",
-    imageURL: "/img/team/team-3.jgp",
+    imageURL: "/img/team/team-3.jpg",
     socialLink: {
       instagram: "https://www.instagram.com/PROFILE_ID",
       whatsapp: "https://wa.me/919449460823",
