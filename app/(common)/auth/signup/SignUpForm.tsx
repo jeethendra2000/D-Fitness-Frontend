@@ -10,6 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 
 const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
 
@@ -22,6 +23,8 @@ export default function SignUpForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
+
 
   const validate = () => {
     const newErrors: string[] = [];
@@ -52,62 +55,7 @@ export default function SignUpForm() {
     setLoading(true);
 
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        newPassword
-      );
-
-      try {
-        const idToken = await user.getIdToken();
-        await fetch(`${backendUrl}/auth/create-profile/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            uid: user.uid,
-            email: user.email,
-            first_name: firstName,
-            last_name: lastName,
-          }),
-        });
-      } catch (error) {
-        console.error("Error creating profile:", error);
-        toast.warn(
-          "Account created, but failed to create profile. Please contact support.",
-          { autoClose: 5000 }
-        );
-      }
-
-      try {
-        const idToken = await user.getIdToken();
-        const resp = await fetch(`${backendUrl}/auth/users/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({
-            firebase_uid: user.uid,
-            email: user.email,
-            first_name: firstName,
-            last_name: lastName,
-          }),
-        });
-
-        if (!resp.ok) {
-          const errBody = await resp.json().catch(() => ({}));
-          throw new Error(errBody.detail || "Failed to create user in backend");
-        }
-      } catch (err: unknown) {
-        console.error("Error creating user in backend:", err);
-        toast.warn(
-          "Account created, but failed to sync with backend. Please contact support.",
-          { autoClose: 5000 }
-        );
-      }
+      const res = await createUserWithEmailAndPassword(email, newPassword);
 
       toast.success("Registration successful! Please log in.", {
         autoClose: 3000,

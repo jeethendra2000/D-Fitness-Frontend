@@ -11,12 +11,20 @@ import Tooltip from '@mui/material/Tooltip';
 import PersonAdd from '@mui/icons-material/PersonAdd';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
-import { useRouter } from 'next/navigation';
+
+import { signOut } from "firebase/auth";
+import { auth } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import Loader from "@/components/utilityComponents/Loader";
+
 
 export default function AccountMenu() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [loggingOut, setLoggingOut] = React.useState(false);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,17 +36,20 @@ export default function AccountMenu() {
   const handleLogout = async () => {
     setAnchorEl(null);
     try{
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/logout/`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            cache: 'no-store',
+        await signOut(auth);
+  
+        console.log("Signing out from backend session");
+  
+        const resp = await fetch("/api/sessionLogout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
         });
-        if (!res.ok) {
-            console.error('Logout failed: ', await res.text());
-        }
+  
+        await new Promise((r) => setTimeout(r, 80));
+  
+        toast.success("Logged Out", { autoClose: 2500 });
+        router.replace("/");
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
@@ -46,6 +57,10 @@ export default function AccountMenu() {
       router.replace('/');
     }
   };
+
+  if (loggingOut) {
+    return <Loader message="Logging out..." dimBackground={true} />;
+  }
 
   return (
     <React.Fragment>
