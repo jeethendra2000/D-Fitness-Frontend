@@ -39,8 +39,8 @@ export default function SubscriptionForm({
       setLoading(true);
       try {
         const [customerRes, membershipRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/Customers`),
-          fetch(`${API_BASE_URL}/Memberships`),
+          fetch(`${API_BASE_URL}/Customers?pageSize=1000`),
+          fetch(`${API_BASE_URL}/Memberships?pageSize=1000`),
         ]);
 
         const [customerJson, membershipJson] = await Promise.all([
