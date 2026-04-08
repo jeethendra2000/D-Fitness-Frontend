@@ -87,12 +87,12 @@ export default function LoginClient() {
         />
         <MyPassField label="Password" name="password" />
         <div className="flex justify-between mb-5">
-          <p>
+          {/* <p>
             Don&apos;t have an account?{" "}
             <a href="/auth/signup" style={{ color: "#ff1313" }}>
               Register
             </a>
-          </p>
+          </p> */}
           <p>
             <Link href="/forgot-password" style={{ color: "#ff1313" }}>
               Forgot Password
